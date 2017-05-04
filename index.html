@@ -116,7 +116,7 @@
             // Border
             if (x >= 0 && y >= 0 && x < Game.map.length && y < Game.map[0].length) {
                 // Elements in map
-                if (Game.map[x][y] != Game.WALL || Game.map[x][y] != Game.ROCK) {
+                if (Game.map[x][y] != Game.WALL && Game.map[x][y] != Game.ROCK) {
                     return true;
                 }
 
