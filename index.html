@@ -110,7 +110,18 @@
         }
 
         function _checkMap(x, y) {
-            if (x >= 0 && y >= 0) return true;
+            x = x / Game.vars.size;
+            y = y / Game.vars.size;
+
+            // Border
+            if (x >= 0 && y >= 0 && x < Game.map.length && y < Game.map[0].length) {
+                // Elements in map
+                if (Game.map[x][y] != Game.WALL || Game.map[x][y] != Game.ROCK) {
+                    return true;
+                }
+
+                return false;
+            }
 
             return false;
         }
