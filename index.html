@@ -18,10 +18,12 @@
 
                 if (!(i == 0 && j == 0)) {
                     var chance = Math.random() * 100;
-                    if (chance > 90) item = Game.ROCK;
-                    else if (chance > 85) item = Game.DIAMOND;
-                    else if (chance > 80) item = Game.WALL;
-                    else if (chance > 40) item = Game.DIRT;
+                    //if (chance > 90) item = Game.ROCK;
+                    //else if (chance > 85) item = Game.DIAMOND;
+                    //else if (chance > 80) item = Game.WALL;
+                    //else if (chance > 40) item = Game.DIRT;
+                    if (chance > 95) item = Game.ROCK;
+                    else if (chance > 80) item = Game.DIRT;
                 }
 
                 result[i][j] = item;
@@ -40,7 +42,7 @@
 
     Game.vars = {};
     Game.vars.size = 32;
-    Game.vars.speed = 100;
+    Game.vars.speed = 500;
     Game.vars.score = 0;
     Game.vars.lives = 3;
     Game.vars.level = 0;
@@ -178,9 +180,28 @@
             }
         }
 
+        function _checkGravity(parent) {
+            for (i = 0; i < Game.map.length; ++i) {
+                var row = Game.map[i];
+
+                for (j = row.length - 2; j > 0; --j) {
+                    if (Game.map[i][j] == Game.ROCK && Game.map[i][j + 1] == 0) {
+                        console.log("lpok", i, j)
+                        Game.map[i][j] = 0;
+                        Game.map[i][j + 1] = Game.ROCK;
+
+                        Game.spriteMap[i][j].y += Game.vars.size;
+                        Game.spriteMap[i][j + 1] = Game.spriteMap[i][j];
+                        Game.spriteMap[i][j] = 0;
+                    }
+                }
+            }
+        }
+
         function update() {
             if (this.updateTime < this.time.now) {
                 _checkKeys(this);
+                _checkGravity(this);
                 this.updateTime = this.time.now + Game.vars.speed;
             }
         }
