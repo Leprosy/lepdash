@@ -8,6 +8,18 @@
     <body>
 
     <script type="text/javascript">
+    //Utils
+    function createGround(width, height){
+        var result = [];
+        for (var i = 0 ; i < width; i++) {
+            result[i] = [];
+            for (var j = 0; j < height; j++) {
+                result[i][j] = (Math.random() * 5 | 0);
+            }
+        }
+        return result;
+    }
+
     // Namespace and basic parameters
     var Game = {};
     Game.vars = {};
@@ -16,6 +28,11 @@
     Game.vars.score = 0;
     Game.vars.lives = 3;
     Game.vars.level = 0;
+
+    //JSON this!
+    Game.map = createGround(15, 15);
+    console.log(Game.map)
+
 
     // Entry point
     window.onload = function() {
@@ -31,9 +48,25 @@
             this.tapTime = this.time.now + Game.vars.speed * 50;
             _setSpeed();
             _setBG();
+            _setMap();
             _setActors();
             Game.cursors = Game.base.input.keyboard.createCursorKeys();
             Game.player.animations.play("still");
+        }
+
+        function _setMap() {
+            for (i in Game.map) {
+                var row = Game.map[i]
+
+                for(j in row) {
+                    if (row[j] != 0) {
+                        Game.base
+                            .add
+                            .sprite(Game.vars.size * i, Game.vars.size * j, 'sprites')
+                            .frame = 31 + row[j];
+                    }
+                }
+            }
         }
 
         function _setSpeed() {
