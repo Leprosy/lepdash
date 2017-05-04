@@ -109,21 +109,27 @@
             });
         }
 
+        function _checkMap(x, y) {
+            if (x >= 0 && y >= 0) return true;
+
+            return false;
+        }
+
         function _checkKeys(parent) {
             if (Game.cursors.left.isDown) {
-                Game.player.x -= Game.vars.size;
+                if (_checkMap(Game.player.x - Game.vars.size, Game.player.y)) Game.player.x -= Game.vars.size;
                 Game.player.animations.play('left');
                 parent.tapTime = parent.time.now + Game.vars.speed * 50;
             } else if (Game.cursors.right.isDown) {
-                Game.player.x += Game.vars.size;
+                if (_checkMap(Game.player.x + Game.vars.size, Game.player.y)) Game.player.x += Game.vars.size;
                 Game.player.animations.play('right');
                 parent.tapTime = parent.time.now + Game.vars.speed * 50;
             } else if (Game.cursors.up.isDown) {
-                Game.player.y -= Game.vars.size;
+                if (_checkMap(Game.player.x, Game.player.y - Game.vars.size)) Game.player.y -= Game.vars.size;
                 Game.player.animations.play('left');
                 parent.tapTime = parent.time.now + Game.vars.speed * 50;
             } else if (Game.cursors.down.isDown) {
-                Game.player.y += Game.vars.size;
+                if (_checkMap(Game.player.x, Game.player.y + Game.vars.size)) Game.player.y += Game.vars.size;
                 Game.player.animations.play('right');
                 parent.tapTime = parent.time.now + Game.vars.speed * 50;
             } else {
