@@ -17,9 +17,11 @@
                 var item = 0;
 
                 if (!(i == 0 && j == 0)) {
-                    if (Math.random() * 100 > 90) item = Game.ROCK;
-                    if (Math.random() * 100 > 90) item = Game.WALL;
-                    if (Math.random() * 100 > 50) item = Game.DIRT;
+                    var chance = Math.random() * 100;
+                    if (chance > 90) item = Game.ROCK;
+                    else if (chance > 85) item = Game.DIAMOND;
+                    else if (chance > 80) item = Game.WALL;
+                    else if (chance > 40) item = Game.DIRT;
                 }
 
                 result[i][j] = item;
@@ -34,6 +36,7 @@
     Game.DIRT2 = 3;
     Game.WALL = 1;
     Game.ROCK = 4;
+    Game.DIAMOND = 5;
 
     Game.vars = {};
     Game.vars.size = 32;
@@ -44,6 +47,7 @@
 
     //JSON this!
     Game.map = createGround(15, 15);
+    Game.spriteMap = createGround(15, 15);
     console.log(Game.map)
 
 
@@ -73,10 +77,16 @@
 
                 for(j in row) {
                     if (row[j] != 0) {
-                        Game.base
-                            .add
-                            .sprite(Game.vars.size * i, Game.vars.size * j, 'sprites')
-                            .frame = 31 + row[j];
+                        var sprite = Game.base.add.sprite(Game.vars.size * i, Game.vars.size * j, 'sprites');
+                        Game.spriteMap[i][j] = sprite;
+
+                        // Special map things
+                        if (row[j] == Game.DIAMOND) {
+                            sprite.animations.add("be", [40, 50, 60, 70, 41, 51, 61, 71], 10, true);
+                            sprite.animations.play("be");
+                        } else { // Everything else
+                            sprite.frame = 31 + row[j];
+                        }
                     }
                 }
             }
@@ -117,6 +127,17 @@
             if (x >= 0 && y >= 0 && x < Game.map.length && y < Game.map[0].length) {
                 // Elements in map
                 if (Game.map[x][y] != Game.WALL && Game.map[x][y] != Game.ROCK) {
+                    //Check if dirt or item
+                    if (Game.map[x][y] == Game.DIRT) {
+                        Game.map[x][y] = 0;
+                        Game.spriteMap[x][y].destroy();
+                    }
+                    if (Game.map[x][y] == Game.DIAMOND) {
+                        Game.map[x][y] = 0;
+                        Game.spriteMap[x][y].destroy();
+                        Game.vars.score++;
+                    }
+
                     return true;
                 }
 
