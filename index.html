@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>hello phaser!</title>
+        <script src="js/phaser.js"></script>
+    </head>
+    <body>
+
+    <script type="text/javascript">
+    // Namespace and basic parameters
+    var Game = {};
+    Game.vars = {};
+    Game.vars.size = 32;
+    Game.vars.speed = 100;
+    Game.vars.score = 0;
+    Game.vars.lives = 3;
+    Game.vars.level = 0;
+
+    // Entry point
+    window.onload = function() {
+        Game.base = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+
+        function preload () {
+            Game.base.load.image('bg', 'img/bg0.png');
+            Game.base.load.spritesheet('sprites', 'img/sprites.png', Game.vars.size, Game.vars.size);
+        }
+
+        function create () {
+            this.updateTime = this.time.now + Game.vars.speed;
+            this.tapTime = this.time.now + Game.vars.speed * 50;
+            _setSpeed();
+            _setBG();
+            _setActors();
+            Game.cursors = Game.base.input.keyboard.createCursorKeys();
+            Game.player.animations.play("still");
+        }
+
+        function _setSpeed() {
+            /*Game.base.time.advancedTiming = true;
+            Game.base.time.desiredFps = 60;*/
+            /* Game.base.time.desiredFps = 120;
+            Game.base.time.slowMotion = 10 // 10.0; */
+        }
+
+        function _setBG() {
+            Game.bg = Game.base.add.sprite(Game.base.world.centerX, Game.base.world.centerY, 'bg');
+            Game.bg.anchor.setTo(0.5, 0.5);
+        }
+
+        function _setActors() {
+            Game.player = Game.base.add.sprite(32, 32, 'sprites');
+            Game.player.animations.add('left', [10, 11, 12, 13, 14, 15, 16], 20, false);
+            Game.player.animations.add('right', [20, 21, 22, 23, 24, 25, 26], 20, false);
+            Game.player.animations.add('up', [10, 11, 12, 13, 14, 15, 16], 20, false);
+            Game.player.animations.add('down', [20, 21, 22, 23, 24, 25, 26], 20, false);
+            Game.player.animations.add('still', [0], 10, false);
+            Game.player.animations.add('blink', [0, 1, 2, 1], 10, false).onComplete.add(function() {
+                Game.player.animations.play("still");
+            });
+            Game.player.animations.add('tap', [3, 4, 3, 4, 5, 6, 5, 4, 3, 4, 3, 4, 5, 6, 5, 4], 10, false).onComplete.add(function() {
+                Game.player.animations.play("still");
+            });
+        }
+
+        function _checkKeys(parent) {
+            if (Game.cursors.left.isDown) {
+                Game.player.x -= Game.vars.size;
+                Game.player.animations.play('left');
+                parent.tapTime = parent.time.now + Game.vars.speed * 50;
+            } else if (Game.cursors.right.isDown) {
+                Game.player.x += Game.vars.size;
+                Game.player.animations.play('right');
+                parent.tapTime = parent.time.now + Game.vars.speed * 50;
+            } else if (Game.cursors.up.isDown) {
+                Game.player.y -= Game.vars.size;
+                Game.player.animations.play('left');
+                parent.tapTime = parent.time.now + Game.vars.speed * 50;
+            } else if (Game.cursors.down.isDown) {
+                Game.player.y += Game.vars.size;
+                Game.player.animations.play('right');
+                parent.tapTime = parent.time.now + Game.vars.speed * 50;
+            } else {
+                if (Game.player.animations.currentAnim.isFinished) {
+                    if (parent.tapTime < parent.time.now) {
+                        parent.tapTime = parent.time.now + Game.vars.speed * 50;
+                        Game.player.animations.play("tap");
+                    } else if (Math.random() * 10 > 9.5) {
+                        Game.player.animations.play("blink");
+                    } else {
+                        Game.player.animations.play("still");
+                    }
+                }
+            }
+        }
+
+        function update() {
+            if (this.updateTime < this.time.now) {
+                _checkKeys(this);
+                this.updateTime = this.time.now + Game.vars.speed;
+            }
+        }
+    };
+    </script>
+
+    </body>
+</html>
