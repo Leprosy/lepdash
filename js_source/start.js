@@ -2,6 +2,7 @@
 Engine = new Phaser.Game(Game.width, Game.height, Phaser.AUTO, "game");
 Engine.state.add("load", Game.loadState);
 Engine.state.add("main", Game.mainState);
+Engine.state.add("play", Game.playState);
 
 // Let's roll
 window.onload = function() {
