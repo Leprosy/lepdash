@@ -68,6 +68,8 @@ Game.mainState = {
 
 // Play loop state
 Game.playState = {
+    cursors: null,
+    //player: null,
     preload: function() {
         console.info(Game.name + " play loop");
     },
@@ -83,6 +85,7 @@ Game.playState = {
         // add player
         Game.player = this._createPlayer();
         Game.player.animations.play("tap");
+        this.cursors = Engine.input.keyboard.createCursorKeys();
         // add HUD
         Game.HUD = Engine.add.text(10, Game.height - 15, "", {
             font: "15px Arial",
@@ -90,17 +93,35 @@ Game.playState = {
         });
     },
     update: function() {
+        this._checkInput();
         this._updateHUD();
     },
     _updateHUD: function() {
         Game.HUD.text = "Map:" + Game.level + " Score: " + Game.score + " Lives: " + Game.lives;
     },
+    _checkInput: function() {
+        if (this.cursors.left.isDown) {
+            Game.player.x -= 2;
+            Game.player.play("left");
+        } else if (this.cursors.right.isDown) {
+            Game.player.x += 2;
+            Game.player.play("right");
+        } else if (this.cursors.up.isDown) {
+            Game.player.y -= 2;
+            Game.player.play("up");
+        } else if (this.cursors.down.isDown) {
+            Game.player.y += 2;
+            Game.player.play("down");
+        } else {
+            Game.player.play("still");
+        }
+    },
     _createPlayer: function() {
-        var player = player = Engine.add.sprite(0, 0, "player");
-        player.animations.add("left", [ 10, 11, 12, 13, 14, 15, 16 ], 20, false);
-        player.animations.add("right", [ 20, 21, 22, 23, 24, 25, 26 ], 20, false);
-        player.animations.add("up", [ 10, 11, 12, 13, 14, 15, 16 ], 20, false);
-        player.animations.add("down", [ 20, 21, 22, 23, 24, 25, 26 ], 20, false);
+        var player = player = Engine.add.sprite(Game.tileSize, Game.tileSize, "player");
+        player.animations.add("left", [ 7, 8, 9, 10, 11, 12, 13 ], 20, false);
+        player.animations.add("right", [ 14, 15, 16, 17, 18, 19, 20 ], 20, false);
+        player.animations.add("up", [ 7, 8, 9, 10, 11, 12, 13 ], 20, false);
+        player.animations.add("down", [ 14, 15, 16, 17, 18, 19, 20 ], 20, false);
         player.animations.add("still", [ 0 ], 10, false);
         player.animations.add("blink", [ 0, 1, 2, 1 ], 10, false).onComplete.add(function() {
             player.animations.play("still");
