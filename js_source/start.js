@@ -1,5 +1,14 @@
 // Setting up main states
-Engine = new Phaser.Game(Game.width, Game.height, Phaser.AUTO, "game");
+Engine = new Phaser.Game({
+        //enableDebug: false,
+        width: Game.width,
+        height: Game.height,
+        renderer: Phaser.AUTO,
+        antialias: false,
+        //transparent: true,
+        parent: "game"});
+
+//Engine = new Phaser.Game(Game.width, Game.height, Phaser.AUTO, "game");
 Engine.state.add("load", Game.loadState);
 Engine.state.add("main", Game.mainState);
 Engine.state.add("play", Game.playState);

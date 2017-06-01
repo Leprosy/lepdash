@@ -11,6 +11,7 @@ Game.loadState = {
         Engine.load.spritesheet("player", "img/player.png", Game.tileSize, Game.tileSize);
         Engine.load.spritesheet("terrain", "img/terrain.png", Game.tileSize, Game.tileSize);
         Engine.load.tilemap("map", "maps/map1.json", null, Phaser.Tilemap.TILED_JSON);
+        Engine.load.audio("theme", "snd/theme.mp3");
     },
 
     create: function() {
