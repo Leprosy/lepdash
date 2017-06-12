@@ -10,6 +10,9 @@ engines:
       - javascript
   fixme:
     enabled: true
+ratings:
+  paths:
+    - js/
 exclude_paths:
 - js/phaser.js
 - js/game.js
