@@ -1,0 +1,12 @@
+engines:
+  eslint:
+    enabled: true
+  csslint:
+    enabled: true
+  duplication:
+    enabled: true
+  fixme:
+    enabled: true
+exclude_paths:
+- js/phaser.js
+- js/game.js
