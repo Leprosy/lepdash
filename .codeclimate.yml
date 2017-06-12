@@ -12,7 +12,8 @@ engines:
     enabled: true
 ratings:
   paths:
-    - js/
+    - js_source/
+    - index.html
 exclude_paths:
 - js/phaser.js
 - js/game.js
