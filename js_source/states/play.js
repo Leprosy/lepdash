@@ -20,8 +20,8 @@ Game.playState = {
 
         // build map
         Game.map = Engine.add.tilemap("map", Game.tileSize, Game.tileSize);
-        Game.map.addTilesetImage("tiles", "terrain"); //"tiles name in JSON", "tileset" defined in preload state
-        Game.layer = Game.map.createLayer("map" + Game.level); // If storing all levels in one map, watch out for index of layer(Game.map.currentLayer)
+        Game.map.addTilesetImage("tiles", "tiles"); //"tiles name in JSON", "tileset" defined in preload state
+        Game.layer = Game.map.createLayer("map");
         Game.layer.resizeWorld();
 
         // add player
@@ -90,6 +90,7 @@ Game.playState = {
                 Game.player.newX = Game.player.x;
                 Game.player.newY = Game.player.y;
                 console.log("bump");
+                break;
             default:
                 break;
         }

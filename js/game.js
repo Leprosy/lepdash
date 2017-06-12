@@ -31,7 +31,7 @@ Game.loadState = {
         });
         //Engine.load.image('bg', 'img/bg0.png');
         Engine.load.spritesheet("player", "img/player.png", Game.tileSize, Game.tileSize);
-        Engine.load.spritesheet("terrain", "img/terrain.png", Game.tileSize, Game.tileSize);
+        Engine.load.spritesheet("tiles", "img/tiles.png", Game.tileSize, Game.tileSize);
         Engine.load.tilemap("map", "maps/map1.json", null, Phaser.Tilemap.TILED_JSON);
         Engine.load.audio("theme", "snd/theme.mp3");
     },
@@ -92,9 +92,9 @@ Game.playState = {
         console.info("Game params", Game);
         // build map
         Game.map = Engine.add.tilemap("map", Game.tileSize, Game.tileSize);
-        Game.map.addTilesetImage("tiles", "terrain");
+        Game.map.addTilesetImage("tiles", "tiles");
         //"tiles name in JSON", "tileset" defined in preload state
-        Game.layer = Game.map.createLayer("map" + Game.level);
+        Game.layer = Game.map.createLayer("map");
         // If storing all levels in one map, watch out for index of layer(Game.map.currentLayer)
         Game.layer.resizeWorld();
         // add player
@@ -142,7 +142,7 @@ Game.playState = {
     _checkMap: function() {
         var tile = Game.map.getTileWorldXY(Game.player.newX, Game.player.newY);
         // For now, erase dirt
-        console.log(tile.index);
+        //console.log(tile.index)
         switch (tile.index) {
           case this.terrain.DIRT:
           case this.terrain.DIRT2:
@@ -155,6 +155,7 @@ Game.playState = {
             Game.player.newX = Game.player.x;
             Game.player.newY = Game.player.y;
             console.log("bump");
+            break;
 
           default:
             break;
