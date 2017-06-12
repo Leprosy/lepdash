@@ -14,7 +14,7 @@ Game.width = 800;
 
 Game.height = 600;
 
-Game.speed = 300;
+Game.speed = 200;
 
 /*User*/
 Game.tileSize = 32;
@@ -76,7 +76,13 @@ Game.mainState = {
 // Play loop state
 Game.playState = {
     cursors: null,
-    //player: null,
+    terrain: {
+        NULL: 1,
+        STEEL: 2,
+        WALL: 4,
+        DIRT: 5,
+        DIRT2: 6
+    },
     preload: function() {
         console.info(Game.name + " play loop");
     },
@@ -89,11 +95,11 @@ Game.playState = {
         Game.map.addTilesetImage("tiles", "terrain");
         //"tiles name in JSON", "tileset" defined in preload state
         Game.layer = Game.map.createLayer("map" + Game.level);
-        // TODO: If storing all levels in one map, watch out for index of layer(Game.map.currentLayer)
+        // If storing all levels in one map, watch out for index of layer(Game.map.currentLayer)
         Game.layer.resizeWorld();
         // add player
         Game.player = this._createPlayer();
-        Game.player.animations.play("tap");
+        //Game.player.animations.play("tap");
         this.cursors = Engine.input.keyboard.createCursorKeys();
         // add HUD
         Game.HUD = Engine.add.text(10, Game.height - 15, "", {
@@ -101,7 +107,6 @@ Game.playState = {
             fill: "#ffffff"
         });
         // Timer
-        console.log(this);
         this.updateTime = this.time.now + Game.speed;
         this.tapTime = this.time.now + Game.speed * 50;
     },
@@ -119,27 +124,44 @@ Game.playState = {
     },
     _checkInput: function() {
         if (this.cursors.left.isDown) {
-            Game.player.x -= Game.tileSize;
+            Game.player.newX -= Game.tileSize;
             Game.player.play("left");
         } else if (this.cursors.right.isDown) {
-            Game.player.x += Game.tileSize;
+            Game.player.newX += Game.tileSize;
             Game.player.play("right");
         } else if (this.cursors.up.isDown) {
-            Game.player.y -= Game.tileSize;
+            Game.player.newY -= Game.tileSize;
             Game.player.play("up");
         } else if (this.cursors.down.isDown) {
-            Game.player.y += Game.tileSize;
+            Game.player.newY += Game.tileSize;
             Game.player.play("down");
         } else {
             Game.player.play("still");
         }
     },
     _checkMap: function() {
-        var tile = Game.map.getTileWorldXY(Game.player.x, Game.player.y);
+        var tile = Game.map.getTileWorldXY(Game.player.newX, Game.player.newY);
         // For now, erase dirt
-        if (tile.index == 5) {
-            Game.map.replace(5, 1, tile.x, tile.y, 1, 1);
+        console.log(tile.index);
+        switch (tile.index) {
+          case this.terrain.DIRT:
+          case this.terrain.DIRT2:
+            Game.map.replace(this.terrain.DIRT, this.terrain.NULL, tile.x, tile.y, 1, 1);
+            Game.map.replace(this.terrain.DIRT2, this.terrain.NULL, tile.x, tile.y, 1, 1);
+            break;
+
+          case this.terrain.STEEL:
+          case this.terrain.WALL:
+            Game.player.newX = Game.player.x;
+            Game.player.newY = Game.player.y;
+            console.log("bump");
+
+          default:
+            break;
         }
+        // Set new position(if the player can move)
+        Game.player.x = Game.player.newX;
+        Game.player.y = Game.player.newY;
     },
     _createPlayer: function() {
         var player = Engine.add.sprite(Game.tileSize, Game.tileSize, "player");
@@ -154,6 +176,8 @@ Game.playState = {
         player.animations.add("tap", [ 3, 4, 3, 4, 5, 6, 5, 4, 3, 4, 3, 4, 5, 6, 5, 4 ], 10, false).onComplete.add(function() {
             player.animations.play("still");
         });
+        player.newX = player.x;
+        player.newY = player.y;
         return player;
     }
 };
