@@ -4,9 +4,12 @@ Game.playState = {
     terrain: {
         NULL: 1,
         STEEL: 2,
+        WTF: 3,
         WALL: 4,
         DIRT: 5,
-        DIRT2: 6
+        DIRT2: 6,
+        BOULDER: 7,
+        DIAMOND: 8
     },
 
     preload: function() {
@@ -78,7 +81,7 @@ Game.playState = {
     _checkMap: function() {
         var tile = Game.map.getTileWorldXY(Game.player.newX, Game.player.newY);
         // For now, erase dirt
-        //console.log(tile.index)
+        console.log(tile.index)
         switch (tile.index) {
             case this.terrain.DIRT:
             case this.terrain.DIRT2:
