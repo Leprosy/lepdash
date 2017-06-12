@@ -26,6 +26,7 @@
  "properties":
     {
      "color":"#ff6666",
+     "diamonds":5,
      "name":"Hello",
      "startX":2,
      "startY":2
@@ -33,6 +34,7 @@
  "propertytypes":
     {
      "color":"string",
+     "diamonds":"int",
      "name":"string",
      "startX":"int",
      "startY":"int"
