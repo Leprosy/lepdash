@@ -47,6 +47,16 @@ Game.playState = {
             this._checkMap();
             this._updateHUD();
 
+            // check status
+            //Lives?
+            if (Game.lives === -1) {
+                alert("Game over!");
+            }
+            //Diamonds?
+            if (Game.map.properties.diamonds === Game.diamonds) {
+                alert("Done!");
+            }
+
             this.updateTime = this.time.now + Game.speed;
         }
     },
@@ -58,7 +68,7 @@ Game.playState = {
 
 
     _updateHUD: function() {
-        Game.HUD.text = "Map:" + Game.level + " Score: " + Game.score + " Lives: " + Game.lives;
+        Game.HUD.text = "Map:" + Game.level + " Diamonds: " + Game.diamonds + " of " + Game.map.properties.diamonds + " Lives: " + Game.lives;
     },
 
     _checkInput: function() {
@@ -89,12 +99,19 @@ Game.playState = {
                 Game.map.replace(this.terrain.DIRT, this.terrain.NULL, tile.x, tile.y, 1, 1);
                 Game.map.replace(this.terrain.DIRT2, this.terrain.NULL, tile.x, tile.y, 1, 1);
                 break;
+
+            case this.terrain.DIAMOND:
+                Game.diamonds++;
+                Game.map.replace(this.terrain.DIAMOND, this.terrain.NULL, tile.x, tile.y, 1, 1);
+                break;
+
             case this.terrain.STEEL:
             case this.terrain.WALL:
                 Game.player.newX = Game.player.x;
                 Game.player.newY = Game.player.y;
                 console.log("bump");
                 break;
+
             default:
                 break;
         }

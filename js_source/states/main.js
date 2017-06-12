@@ -17,7 +17,7 @@ Game.mainState = {
 
         // Set game parameters
         Game.level = 1;
-        Game.score = 0;
+        Game.diamonds = 0;
         Game.lives = 3;
 
         // Wait for user input
