@@ -79,9 +79,12 @@ Game.playState = {
     terrain: {
         NULL: 1,
         STEEL: 2,
+        WTF: 3,
         WALL: 4,
         DIRT: 5,
-        DIRT2: 6
+        DIRT2: 6,
+        BOULDER: 7,
+        DIAMOND: 8
     },
     preload: function() {
         console.info(Game.name + " play loop");
@@ -95,10 +98,10 @@ Game.playState = {
         Game.map.addTilesetImage("tiles", "tiles");
         //"tiles name in JSON", "tileset" defined in preload state
         Game.layer = Game.map.createLayer("map");
-        // If storing all levels in one map, watch out for index of layer(Game.map.currentLayer)
         Game.layer.resizeWorld();
+        console.info("Entering map:", Game.map.properties.name);
         // add player
-        Game.player = this._createPlayer();
+        Game.player = this._createPlayer(Game.map.properties.startX, Game.map.properties.startY);
         //Game.player.animations.play("tap");
         this.cursors = Engine.input.keyboard.createCursorKeys();
         // add HUD
@@ -142,7 +145,7 @@ Game.playState = {
     _checkMap: function() {
         var tile = Game.map.getTileWorldXY(Game.player.newX, Game.player.newY);
         // For now, erase dirt
-        //console.log(tile.index)
+        console.log(tile.index);
         switch (tile.index) {
           case this.terrain.DIRT:
           case this.terrain.DIRT2:
@@ -164,8 +167,8 @@ Game.playState = {
         Game.player.x = Game.player.newX;
         Game.player.y = Game.player.newY;
     },
-    _createPlayer: function() {
-        var player = Engine.add.sprite(Game.tileSize, Game.tileSize, "player");
+    _createPlayer: function(x, y) {
+        var player = Engine.add.sprite(Game.tileSize * x, Game.tileSize * y, "player");
         player.animations.add("left", [ 7, 8, 9, 10, 11, 12, 13 ], 20, false);
         player.animations.add("right", [ 14, 15, 16, 17, 18, 19, 20 ], 20, false);
         player.animations.add("up", [ 7, 8, 9, 10, 11, 12, 13 ], 20, false);

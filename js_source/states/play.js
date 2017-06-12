@@ -26,9 +26,10 @@ Game.playState = {
         Game.map.addTilesetImage("tiles", "tiles"); //"tiles name in JSON", "tileset" defined in preload state
         Game.layer = Game.map.createLayer("map");
         Game.layer.resizeWorld();
+        console.info("Entering map:", Game.map.properties.name);
 
         // add player
-        Game.player = this._createPlayer();
+        Game.player = this._createPlayer(Game.map.properties.startX, Game.map.properties.startY);
         //Game.player.animations.play("tap");
         this.cursors = Engine.input.keyboard.createCursorKeys();
 
@@ -103,8 +104,8 @@ Game.playState = {
         Game.player.y = Game.player.newY;
     },
 
-    _createPlayer: function() {
-        var player = Engine.add.sprite(Game.tileSize, Game.tileSize, "player");
+    _createPlayer: function(x, y) {
+        var player = Engine.add.sprite(Game.tileSize * x, Game.tileSize * y, "player");
         player.animations.add("left", [7, 8, 9, 10, 11, 12, 13], 20, false);
         player.animations.add("right", [14, 15, 16, 17, 18, 19, 20], 20, false);
         player.animations.add("up", [7, 8, 9, 10, 11, 12, 13], 20, false);
