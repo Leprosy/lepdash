@@ -116,7 +116,9 @@ Game.playState = {
     update: function() {
         if (this.updateTime < this.time.now) {
             this._checkInput();
-            this._checkMap();
+            this._checkMapCollision();
+            this._checkFallings();
+            this._setFallings();
             this._checkStatus();
             this._updateHUD();
             this.updateTime = this.time.now + Game.speed;
@@ -153,7 +155,7 @@ Game.playState = {
             Game.player.play("still");
         }
     },
-    _checkMap: function() {
+    _checkMapCollision: function() {
         // First detect if player can move
         var tile = Game.map.getTileWorldXY(Game.player.newX, Game.player.newY);
         //console.log(tile.index)
@@ -184,6 +186,8 @@ Game.playState = {
         // Set new position(if the player can move)
         Game.player.x = Game.player.newX;
         Game.player.y = Game.player.newY;
+    },
+    _checkFallings: function() {
         // Check falling objects, kill player if in the way
         var playerPos = {
             x: Game.player.x / Game.tileSize,
@@ -214,7 +218,13 @@ Game.playState = {
                 }
             }
         }
+    },
+    _setFallings: function() {
         // Last, mark objects that will start falling next turn
+        var playerPos = {
+            x: Game.player.x / Game.tileSize,
+            y: Game.player.y / Game.tileSize
+        };
         for (x = 0; x < Game.map.width; ++x) {
             for (y = Game.map.height - 2; y >= 0; --y) {
                 var tile = Game.map.getTile(x, y);
