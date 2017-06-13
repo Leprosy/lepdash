@@ -101,8 +101,8 @@ Game.playState = {
         switch (tile.index) {
             case this.terrain.DIRT:
             case this.terrain.DIRT2:
-                Game.map.replace(this.terrain.DIRT, this.terrain.NULL, tile.x, tile.y, 1, 1);
-                Game.map.replace(this.terrain.DIRT2, this.terrain.NULL, tile.x, tile.y, 1, 1);
+                this._remove(tile.x, tile.y, this.terrain.DIRT);
+                this._remove(tile.x, tile.y, this.terrain.DIRT2);
                 break;
 
             case this.terrain.DIAMOND:
@@ -144,7 +144,7 @@ Game.playState = {
                             } else {
                                 tile.properties.falling = false;
                                 tileBellow.properties.falling = true;
-                                Game.map.replace(this.terrain.BOULDER, this.terrain.NULL, tile.x, tile.y, 1, 1);
+                                this._remove(tile.x, tile.y, this.terrain.BOULDER);
                                 Game.map.replace(this.terrain.NULL, this.terrain.BOULDER, tile.x, tileBellow.y, 1, 1);
                             }
                         } else {
@@ -191,5 +191,9 @@ Game.playState = {
         player.newX = player.x;
         player.newY = player.y;
         return player;
+    },
+
+    _remove: function(x, y, index) {
+        Game.map.replace(index, this.terrain.NULL, x, y, 1, 1);
     }
 }
