@@ -117,22 +117,24 @@ Game.playState = {
         if (this.updateTime < this.time.now) {
             this._checkInput();
             this._checkMap();
+            this._checkStatus();
             this._updateHUD();
-            // check status
-            //Lives?
-            if (Game.lives === -1) {
-                alert("Game over!");
-            }
-            //Diamonds?
-            if (Game.map.properties.diamonds === Game.diamonds) {
-                alert("Done!");
-            }
             this.updateTime = this.time.now + Game.speed;
         }
     },
     render: function() {},
     _updateHUD: function() {
         Game.HUD.text = "Map:" + Game.level + " Diamonds: " + Game.diamonds + " of " + Game.map.properties.diamonds + " Lives: " + Game.lives;
+    },
+    _checkStatus: function() {
+        //Lives?
+        if (Game.lives === -1) {
+            console.info("Game over!");
+        }
+        //Diamonds?
+        if (Game.map.properties.diamonds === Game.diamonds) {
+            console.info("Diamonds collected...");
+        }
     },
     _checkInput: function() {
         if (this.cursors.left.isDown) {
@@ -152,9 +154,9 @@ Game.playState = {
         }
     },
     _checkMap: function() {
+        // First detect if player can move
         var tile = Game.map.getTileWorldXY(Game.player.newX, Game.player.newY);
-        // For now, erase dirt
-        console.log(tile.index);
+        //console.log(tile.index)
         switch (tile.index) {
           case this.terrain.DIRT:
           case this.terrain.DIRT2:
@@ -169,6 +171,8 @@ Game.playState = {
 
           case this.terrain.STEEL:
           case this.terrain.WALL:
+          case this.terrain.BOULDER:
+            // boulders can't be moved for now
             Game.player.newX = Game.player.x;
             Game.player.newY = Game.player.y;
             console.log("bump");
@@ -180,6 +184,28 @@ Game.playState = {
         // Set new position(if the player can move)
         Game.player.x = Game.player.newX;
         Game.player.y = Game.player.newY;
+        // Check falling objects, kill player if in the way
+        for (x = 0; x < Game.map.width; ++x) {
+            for (y = Game.map.height - 2; y >= 0; --y) {
+                var tile = Game.map.getTile(x, y);
+                var tileBellow = Game.map.getTile(x, y + 1);
+                var playerPos = {
+                    x: Game.player.x / Game.tileSize,
+                    y: Game.player.y / Game.tileSize
+                };
+                if (tile) {
+                    // TODO: need a way to calculate effective size of map to make this more efficient.
+                    // we have a falling boulder
+                    if (tile.index === this.terrain.BOULDER && tileBellow.index === this.terrain.NULL) {
+                        // Player is not bellow
+                        if (tileBellow.y !== playerPos.y || tileBellow.x !== playerPos.x) {
+                            Game.map.replace(this.terrain.BOULDER, this.terrain.NULL, tile.x, tile.y, 1, 1);
+                            Game.map.replace(this.terrain.NULL, this.terrain.BOULDER, tile.x, tileBellow.y, 1, 1);
+                        }
+                    }
+                }
+            }
+        }
     },
     _createPlayer: function(x, y) {
         var player = Engine.add.sprite(Game.tileSize * x, Game.tileSize * y, "player");
