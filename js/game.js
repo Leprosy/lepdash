@@ -185,22 +185,47 @@ Game.playState = {
         Game.player.x = Game.player.newX;
         Game.player.y = Game.player.newY;
         // Check falling objects, kill player if in the way
+        var playerPos = {
+            x: Game.player.x / Game.tileSize,
+            y: Game.player.y / Game.tileSize
+        };
         for (x = 0; x < Game.map.width; ++x) {
             for (y = Game.map.height - 2; y >= 0; --y) {
                 var tile = Game.map.getTile(x, y);
                 var tileBellow = Game.map.getTile(x, y + 1);
-                var playerPos = {
-                    x: Game.player.x / Game.tileSize,
-                    y: Game.player.y / Game.tileSize
-                };
                 if (tile) {
                     // TODO: need a way to calculate effective size of map to make this more efficient.
-                    // we have a falling boulder
-                    if (tile.index === this.terrain.BOULDER && tileBellow.index === this.terrain.NULL) {
-                        // Player is not bellow
-                        if (tileBellow.y !== playerPos.y || tileBellow.x !== playerPos.x) {
-                            Game.map.replace(this.terrain.BOULDER, this.terrain.NULL, tile.x, tile.y, 1, 1);
-                            Game.map.replace(this.terrain.NULL, this.terrain.BOULDER, tile.x, tileBellow.y, 1, 1);
+                    // we have a falling object
+                    if (tile.properties.falling) {
+                        if (tileBellow.index === this.terrain.NULL) {
+                            // Player crushed?
+                            if (tileBellow.y === playerPos.y && tileBellow.x === playerPos.x) {
+                                console.info("BANG!");
+                            } else {
+                                tile.properties.falling = false;
+                                tileBellow.properties.falling = true;
+                                Game.map.replace(this.terrain.BOULDER, this.terrain.NULL, tile.x, tile.y, 1, 1);
+                                Game.map.replace(this.terrain.NULL, this.terrain.BOULDER, tile.x, tileBellow.y, 1, 1);
+                            }
+                        } else {
+                            tile.properties.falling = false;
+                        }
+                    }
+                }
+            }
+        }
+        // Last, mark objects that will start falling next turn
+        for (x = 0; x < Game.map.width; ++x) {
+            for (y = Game.map.height - 2; y >= 0; --y) {
+                var tile = Game.map.getTile(x, y);
+                var tileBellow = Game.map.getTile(x, y + 1);
+                if (tile) {
+                    // TODO: need a way to calculate effective size of map to make this more efficient.
+                    // We have a fall object (and is not falling)
+                    if (tile.index === this.terrain.BOULDER && !tile.properties.falling) {
+                        // Is falling
+                        if (tileBellow.index === this.terrain.NULL && (tileBellow.y !== playerPos.y || tileBellow.x !== playerPos.x)) {
+                            tile.properties.falling = true;
                         }
                     }
                 }
