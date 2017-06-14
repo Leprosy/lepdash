@@ -146,8 +146,6 @@ Game.playState = {
     // TODO: need a way to calculate effective size of map to make this more efficient in the next couple of methods
     _checkFallings: function() {
         // Check falling objects, kill player if in the way
-        var playerPos = {x: Game.player.x / Game.tileSize, y: Game.player.y / Game.tileSize};
-
         for (x = 0; x < Game.map.width; ++x) {
             for (y = Game.map.height - 2; y >= 0; --y) {
                 var tile = Game.map.getTile(x, y);
@@ -157,8 +155,9 @@ Game.playState = {
                     // we have a falling object
                     if (tile.properties.falling) {
                         if (tileBellow.index === this.terrain.NULL) {
+                            console.log("fall", "P1", Game.player.x / Game.tileSize, Game.player.y / Game.tileSize, "TB " + tileBellow.x + "," + tileBellow.y,  this._playerIn(tileBellow.x, tileBellow.x))
                             // Player crushed?
-                            if (tileBellow.y === playerPos.y && tileBellow.x === playerPos.x) {
+                            if (this._playerIn(tileBellow.x, tileBellow.x)) {
                                 console.info("BANG!");
                             } else {
                                 tile.properties.falling = false;
@@ -177,19 +176,32 @@ Game.playState = {
 
     _setFallings: function() {
         // Last, mark objects that will start falling next turn
-        var playerPos = {x: Game.player.x / Game.tileSize, y: Game.player.y / Game.tileSize};
-
         for (x = 0; x < Game.map.width; ++x) {
             for (y = Game.map.height - 2; y >= 0; --y) {
                 var tile = Game.map.getTile(x, y);
                 var tileBellow = Game.map.getTile(x, y + 1);
 
                 if (tile) {
-                    // We have a fall object (and is not falling)
+                    // We have a potential fallable object (and is not falling)
                     if (tile.index === this.terrain.BOULDER && !tile.properties.falling) {
-                        // Is falling
-                        if (tileBellow.index === this.terrain.NULL && (tileBellow.y !== playerPos.y || tileBellow.x !== playerPos.x)) {
+                        // Nothing bellow, start falling
+                        if (tileBellow.index === this.terrain.NULL && !this._playerIn(tileBellow.x, tileBellow.y)) {
                             tile.properties.falling = true;
+                        }
+
+                        // Is hanging, start falling left-right
+                        if (x > 0 && x < Game.map.width - 1) {
+                            var tileLeft = Game.map.getTile(x - 1, y);
+                            var tileBellowLeft = Game.map.getTile(x - 1, y + 1);
+                            var tileRight = Game.map.getTile(x + 1, y);
+                            var tileBellowRight = Game.map.getTile(x + 1, y + 1);
+
+                            if (tileLeft.index === this.terrain.NULL && tileBellowLeft.index === this.terrain.NULL
+                                    && !this._playerIn(tileLeft.x, tileLeft.y) && !this._playerIn(tileBellowLeft.x, tileBellowLeft.y)) {
+                                Game.map.replace(this.terrain.BOULDER, this.terrain.NULL, tile.x, tile.y, 1, 1);
+                                Game.map.replace(this.terrain.NULL, this.terrain.BOULDER, tileLeft.x, tileLeft.y, 1, 1);
+                                tileLeft.properties.falling = true;
+                            }
                         }
                     }
                 }
@@ -218,5 +230,10 @@ Game.playState = {
 
     _remove: function(x, y, index) {
         Game.map.replace(index, this.terrain.NULL, x, y, 1, 1);
+    },
+    
+    _playerIn: function(x, y) {
+        var playerPos = {x: Game.player.x / Game.tileSize, y: Game.player.y / Game.tileSize};
+        return playerPos.x === x && playerPos.y === y;
     }
 }
