@@ -174,7 +174,7 @@ Game.playState = {
           case this.terrain.STEEL:
           case this.terrain.WALL:
           case this.terrain.BOULDER:
-            if (tile.index === this.terrain.BOULDER && Game.player.newY === Game.player.y) {
+            if (tile.index === this.terrain.BOULDER && Game.player.newY === Game.player.y && !tile.properties.falling) {
                 console.log("trying to push");
                 //Math.sign(Game.player.newX - Game.player.x) === -1 => pushing from left
                 var tileNext = Game.map.getTile(tile.x + Math.sign(Game.player.newX - Game.player.x), tile.y);
