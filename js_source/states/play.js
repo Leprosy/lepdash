@@ -1,5 +1,6 @@
 // Play loop state
 Game.playState = {
+    sfx: {},
     cursors: null,
     terrain: {
         NULL: 1,
@@ -20,6 +21,12 @@ Game.playState = {
     /*User*/
     create: function() {
         console.info("Game params", Game);
+
+        // SFX
+        this.sfx.boulder = Engine.add.audio("boulder");
+        this.sfx.diamond = Engine.add.audio("diamond");
+        this.sfx.dirt = Engine.add.audio("dirt");
+        for (i = 0; i < 8; ++i) this.sfx["diamond" + i] = Engine.add.audio("diamond" + i);
 
         // build map
         Game.map = Engine.add.tilemap("map", Game.tileSize, Game.tileSize);
@@ -105,10 +112,12 @@ Game.playState = {
             case this.terrain.DIRT2:
                 Game.map.replace(this.terrain.DIRT, this.terrain.NULL, tile.x, tile.y, 1, 1);
                 Game.map.replace(this.terrain.DIRT2, this.terrain.NULL, tile.x, tile.y, 1, 1);
+                this.sfx.dirt.play();
                 break;
 
             case this.terrain.DIAMOND:
                 Game.diamonds++;
+                this.sfx.diamond.play();
                 Game.map.replace(this.terrain.DIAMOND, this.terrain.NULL, tile.x, tile.y, 1, 1);
                 break;
 
