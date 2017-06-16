@@ -17,6 +17,7 @@ Game.loadState = {
         Engine.load.audio("boulder", "snd/boulder.ogg");
         Engine.load.audio("diamond", "snd/diamond.ogg");
         Engine.load.audio("dirt", "snd/dirt.ogg");
+        Engine.load.audio("explosion", "snd/explosion.ogg");
         for (i = 0; i < 8; ++i) Engine.load.audio("diamond" + i, "snd/diamond_" + i + ".ogg");
     },
 

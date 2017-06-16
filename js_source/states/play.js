@@ -26,6 +26,7 @@ Game.playState = {
         this.sfx.boulder = Engine.add.audio("boulder");
         this.sfx.diamond = Engine.add.audio("diamond");
         this.sfx.dirt = Engine.add.audio("dirt");
+        this.sfx.explosion = Engine.add.audio("explosion");
         for (i = 0; i < 8; ++i) this.sfx["diamond" + i] = Engine.add.audio("diamond" + i);
 
         // build map
@@ -132,6 +133,7 @@ Game.playState = {
                     if (tileNext.index === this.terrain.NULL && Engine.rnd.integerInRange(0,5) === 0) {
                         Game.map.replace(this.terrain.BOULDER, this.terrain.NULL, tile.x, tile.y, 1, 1);
                         Game.map.replace(this.terrain.NULL, this.terrain.BOULDER, tileNext.x, tileNext.y, 1, 1);
+                        this.sfx.boulder.play();
                     } else {
                         Game.player.newX = Game.player.x;
                         Game.player.newY = Game.player.y;
@@ -166,6 +168,7 @@ Game.playState = {
                         if (tileBellow.index === this.terrain.NULL) {
                             // Player crushed?
                             if (this._playerIn(tileBellow)) {
+                                this.sfx.explosion.play();
                                 console.info("BANG!");
                             } else {
                                 tile.properties.falling = false;
@@ -175,6 +178,7 @@ Game.playState = {
                             }
                         } else {
                             tile.properties.falling = false;
+                            this.sfx.boulder.play();
                         }
                     }
                 }
@@ -194,12 +198,9 @@ Game.playState = {
                     if (tile.index === this.terrain.BOULDER && !tile.properties.falling) {
                         // Nothing bellow, start falling
                         if (tileBellow.index === this.terrain.NULL && !this._playerIn(tileBellow)) {
-                            console.log(tile, "is fallling")
                             tile.properties.falling = true;
-                        }
-
-                        // Is hanging, start falling left-right
-                        if (x > 0 && x < Game.map.width - 1) {
+                        } else if (x > 0 && x < Game.map.width - 1 && !this._playerIn(tileBellow)) {
+                            // Is hanging, player is not bellow, start falling left-right
                             var tileLeft = Game.map.getTile(x - 1, y);
                             var tileBellowLeft = Game.map.getTile(x - 1, y + 1);
                             var tileRight = Game.map.getTile(x + 1, y);
