@@ -103,8 +103,8 @@ Game.playState = {
         switch (tile.index) {
             case this.terrain.DIRT:
             case this.terrain.DIRT2:
-                this._remove(tile.x, tile.y, this.terrain.DIRT);
-                this._remove(tile.x, tile.y, this.terrain.DIRT2);
+                Game.map.replace(this.terrain.DIRT, this.terrain.NULL, tile.x, tile.y, 1, 1);
+                Game.map.replace(this.terrain.DIRT2, this.terrain.NULL, tile.x, tile.y, 1, 1);
                 break;
 
             case this.terrain.DIAMOND:
@@ -151,19 +151,18 @@ Game.playState = {
                 var tile = Game.map.getTile(x, y);
                 var tileBellow = Game.map.getTile(x, y + 1);
 
-                if (tile) {
+                if (tile && tileBellow) {
                     // we have a falling object
                     if (tile.properties.falling) {
                         if (tileBellow.index === this.terrain.NULL) {
-                            console.log("fall", "P1", Game.player.x / Game.tileSize, Game.player.y / Game.tileSize, "TB " + tileBellow.x + "," + tileBellow.y,  this._playerIn(tileBellow.x, tileBellow.x))
                             // Player crushed?
-                            if (this._playerIn(tileBellow.x, tileBellow.x)) {
+                            if (this._playerIn(tileBellow)) {
                                 console.info("BANG!");
                             } else {
                                 tile.properties.falling = false;
                                 tileBellow.properties.falling = true;
-                                this._remove(tile.x, tile.y, this.terrain.BOULDER);
-                                Game.map.replace(this.terrain.NULL, this.terrain.BOULDER, tile.x, tileBellow.y, 1, 1);
+                                Game.map.replace(this.terrain.BOULDER, this.terrain.NULL, tile.x, tile.y, 1, 1);
+                                Game.map.replace(this.terrain.NULL, this.terrain.BOULDER, tileBellow.x, tileBellow.y, 1, 1);
                             }
                         } else {
                             tile.properties.falling = false;
@@ -181,11 +180,12 @@ Game.playState = {
                 var tile = Game.map.getTile(x, y);
                 var tileBellow = Game.map.getTile(x, y + 1);
 
-                if (tile) {
+                if (tile && tileBellow) {
                     // We have a potential fallable object (and is not falling)
                     if (tile.index === this.terrain.BOULDER && !tile.properties.falling) {
                         // Nothing bellow, start falling
-                        if (tileBellow.index === this.terrain.NULL && !this._playerIn(tileBellow.x, tileBellow.y)) {
+                        if (tileBellow.index === this.terrain.NULL && !this._playerIn(tileBellow)) {
+                            console.log(tile, "is fallling")
                             tile.properties.falling = true;
                         }
 
@@ -197,7 +197,7 @@ Game.playState = {
                             var tileBellowRight = Game.map.getTile(x + 1, y + 1);
 
                             if (tileLeft.index === this.terrain.NULL && tileBellowLeft.index === this.terrain.NULL
-                                    && !this._playerIn(tileLeft.x, tileLeft.y) && !this._playerIn(tileBellowLeft.x, tileBellowLeft.y)) {
+                                    && !this._playerIn(tileLeft) && !this._playerIn(tileBellowLeft)) {
                                 Game.map.replace(this.terrain.BOULDER, this.terrain.NULL, tile.x, tile.y, 1, 1);
                                 Game.map.replace(this.terrain.NULL, this.terrain.BOULDER, tileLeft.x, tileLeft.y, 1, 1);
                                 tileLeft.properties.falling = true;
@@ -228,12 +228,8 @@ Game.playState = {
         return player;
     },
 
-    _remove: function(x, y, index) {
-        Game.map.replace(index, this.terrain.NULL, x, y, 1, 1);
-    },
-    
-    _playerIn: function(x, y) {
+    _playerIn: function(tile) {
         var playerPos = {x: Game.player.x / Game.tileSize, y: Game.player.y / Game.tileSize};
-        return playerPos.x === x && playerPos.y === y;
+        return playerPos.x === tile.x && playerPos.y === tile.y;
     }
 }
