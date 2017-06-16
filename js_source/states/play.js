@@ -201,6 +201,11 @@ Game.playState = {
                                 Game.map.replace(this.terrain.BOULDER, this.terrain.NULL, tile.x, tile.y, 1, 1);
                                 Game.map.replace(this.terrain.NULL, this.terrain.BOULDER, tileLeft.x, tileLeft.y, 1, 1);
                                 tileLeft.properties.falling = true;
+                            } else if (tileRight.index === this.terrain.NULL && tileBellowRight.index === this.terrain.NULL
+                                    && !this._playerIn(tileRight) && !this._playerIn(tileBellowRight)) {
+                                Game.map.replace(this.terrain.BOULDER, this.terrain.NULL, tile.x, tile.y, 1, 1);
+                                Game.map.replace(this.terrain.NULL, this.terrain.BOULDER, tileRight.x, tileRight.y, 1, 1);
+                                tileRight.properties.falling = true;
                             }
                         }
                     }
