@@ -1,5 +1,6 @@
 // Play loop state
 Game.playState = {
+    diamonds: false,
     sfx: {},
     cursors: null,
     terrain: {
@@ -35,6 +36,13 @@ Game.playState = {
         Game.layer = Game.map.createLayer("map");
         Game.layer.resizeWorld();
         console.info("Entering map:", Game.map.properties.name);
+        this.diamonds = Engine.add.group();
+        this.diamonds.enableBody = true;
+        Game.map.createFromTiles(this.terrain.DIAMOND, null, "diamond", 0, this.diamonds);
+
+        //  Add animations to all of the coin sprites
+        this.diamonds.callAll('animations.add', 'animations', "still", [0, 1, 2, 3, 4, 5, 6, 7], 10, true);
+        this.diamonds.callAll('animations.play', 'animations', "still");
 
         // add player
         Game.player = this._createPlayer(Game.map.properties.startX, Game.map.properties.startY);

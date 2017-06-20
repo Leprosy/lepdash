@@ -31,6 +31,7 @@ Game.loadState = {
         });
         //Engine.load.image('bg', 'img/bg0.png');
         Engine.load.spritesheet("player", "img/player.png", Game.tileSize, Game.tileSize);
+        Engine.load.spritesheet("diamond", "img/diamond.png", Game.tileSize, Game.tileSize);
         Engine.load.spritesheet("tiles", "img/tiles.png", Game.tileSize, Game.tileSize);
         Engine.load.tilemap("map", "maps/map1.json", null, Phaser.Tilemap.TILED_JSON);
         Engine.load.audio("theme", "snd/theme.ogg");
@@ -80,6 +81,7 @@ Game.mainState = {
 
 // Play loop state
 Game.playState = {
+    diamonds: false,
     sfx: {},
     cursors: null,
     terrain: {
@@ -112,6 +114,12 @@ Game.playState = {
         Game.layer = Game.map.createLayer("map");
         Game.layer.resizeWorld();
         console.info("Entering map:", Game.map.properties.name);
+        this.diamonds = Engine.add.group();
+        this.diamonds.enableBody = true;
+        Game.map.createFromTiles(this.terrain.DIAMOND, null, "diamond", 0, this.diamonds);
+        //  Add animations to all of the coin sprites
+        this.diamonds.callAll("animations.add", "animations", "still", [ 0, 1, 2, 3, 4, 5, 6, 7 ], 10, true);
+        this.diamonds.callAll("animations.play", "animations", "still");
         // add player
         Game.player = this._createPlayer(Game.map.properties.startX, Game.map.properties.startY);
         //Game.player.animations.play("tap");
