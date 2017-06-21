@@ -39,6 +39,7 @@ Game.loadState = {
         Engine.load.audio("diamond", "snd/diamond.ogg");
         Engine.load.audio("dirt", "snd/dirt.ogg");
         Engine.load.audio("explosion", "snd/explosion.ogg");
+        Engine.load.audio("hatch", "snd/hatch.ogg");
         for (i = 0; i < 8; ++i) Engine.load.audio("diamond" + i, "snd/diamond_" + i + ".ogg");
     },
     create: function() {
@@ -106,7 +107,22 @@ Game.playState = {
         this.sfx.diamond = Engine.add.audio("diamond");
         this.sfx.dirt = Engine.add.audio("dirt");
         this.sfx.explosion = Engine.add.audio("explosion");
+        this.sfx.hatch = Engine.add.audio("hatch");
         for (i = 0; i < 8; ++i) this.sfx["diamond" + i] = Engine.add.audio("diamond" + i);
+        // On esc, restart current map, lose a life. If game over, go back to menu
+        var key = Engine.input.keyboard.addKey(Phaser.Keyboard.ESC);
+        key.onDown.addOnce(function() {
+            Game.lives--;
+            if (Game.lives == -1) {
+                Engine.state.start("main");
+            } else {
+                Engine.state.start("play");
+            }
+        }, this);
+        // Create stage
+        this._create();
+    },
+    _create: function() {
         // build map
         Game.map = Engine.add.tilemap("map", Game.tileSize, Game.tileSize);
         Game.map.addTilesetImage("tiles", "tiles");
@@ -135,8 +151,10 @@ Game.playState = {
     },
     update: function() {
         if (this.updateTime < this.time.now) {
-            this._checkInput();
-            this._checkMapCollision();
+            if (Game.player.alive) {
+                this._checkInput();
+                this._checkMapCollision();
+            }
             this._checkFallings();
             this._setFallings();
             this._checkStatus();
@@ -147,18 +165,17 @@ Game.playState = {
     render: function() {},
     _updateHUD: function() {
         Game.HUD.text = "Map:" + Game.level + " Diamonds: " + Game.diamonds + " of " + Game.map.properties.diamonds + " Lives: " + Game.lives;
-    },
-    _checkStatus: function() {
-        //Lives?
-        if (Game.lives === -1) {
-            console.info("Game over!");
-        }
-        //Diamonds?
-        if (Game.map.properties.diamonds === Game.diamonds) {
-            console.info("Diamonds collected...");
+        if (!Game.player.alive) {
+            if (Game.lives == 0) {
+                Game.HUD.text += " GAME OVER";
+            } else {
+                Game.HUD.text += " PRESS ESC TO RESTART LEVEL";
+            }
         }
     },
+    _checkStatus: function() {},
     _checkInput: function() {
+        if (!Game.player.alive) return;
         if (this.cursors.left.isDown) {
             Game.player.newX -= Game.tileSize;
             Game.player.play("left");
@@ -189,8 +206,14 @@ Game.playState = {
 
           case this.terrain.DIAMOND:
             Game.diamonds++;
-            this.sfx.diamond.play();
             Game.map.replace(this.terrain.DIAMOND, this.terrain.NULL, tile.x, tile.y, 1, 1);
+            this.diamonds.getClosestTo(Game.player).kill();
+            // Hatch?
+            if (Game.map.properties.diamonds === Game.diamonds) {
+                this.sfx.hatch.play();
+            } else {
+                this.sfx.diamond.play();
+            }
             break;
 
           case this.terrain.STEEL:
@@ -233,9 +256,9 @@ Game.playState = {
                     if (tile.properties.falling) {
                         if (tileBellow.index === this.terrain.NULL) {
                             // Player crushed?
-                            if (this._playerIn(tileBellow)) {
+                            if (this._playerIn(tileBellow) && Game.player.alive) {
                                 this.sfx.explosion.play();
-                                console.info("BANG!");
+                                Game.player.kill();
                             } else {
                                 tile.properties.falling = false;
                                 tileBellow.properties.falling = true;
