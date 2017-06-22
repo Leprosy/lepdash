@@ -291,6 +291,7 @@ Game.playState = {
                 if (xtile.index !== this.terrain.STEEL) {
                     xtile.properties.falling = false;
                     this._mapRemove(xtile);
+                    this._createExplosion(xtile.x, xtile.y);
 
                     if (this._playerIn(xtile)) {
                         Game.player.kill();
@@ -298,6 +299,15 @@ Game.playState = {
                 }
             }
         }
+    },
+
+    _createExplosion: function(x, y) {
+        var explosion = Engine.add.sprite(Game.tileSize * x, Game.tileSize * y, "sprites");
+        explosion.animations.add("still", [78, 68, 58, 48, 38], 8, false).onComplete.add(function() {
+            explosion.kill();
+        });
+        explosion.animations.play("still");
+        return explosion;
     },
 
     _createPlayer: function(x, y) {
