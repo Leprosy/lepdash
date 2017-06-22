@@ -8,7 +8,7 @@ Engine = new Phaser.Game({
         //transparent: true,
         parent: "game"});
 
-//Engine = new Phaser.Game(Game.width, Game.height, Phaser.AUTO, "game");
+// Use Engine.state.getCurrentState() to get current state object
 Engine.state.add("load", Game.loadState);
 Engine.state.add("main", Game.mainState);
 Engine.state.add("play", Game.playState);

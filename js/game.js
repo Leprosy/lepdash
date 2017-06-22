@@ -30,8 +30,7 @@ Game.loadState = {
             fill: "#ffffff"
         });
         //Engine.load.image('bg', 'img/bg0.png');
-        Engine.load.spritesheet("player", "img/player.png", Game.tileSize, Game.tileSize);
-        Engine.load.spritesheet("diamond", "img/diamond.png", Game.tileSize, Game.tileSize);
+        Engine.load.spritesheet("sprites", "img/sprites.png", Game.tileSize, Game.tileSize);
         Engine.load.spritesheet("tiles", "img/tiles.png", Game.tileSize, Game.tileSize);
         Engine.load.tilemap("map", "maps/map1.json", null, Phaser.Tilemap.TILED_JSON);
         Engine.load.audio("theme", "snd/theme.ogg");
@@ -132,9 +131,9 @@ Game.playState = {
         console.info("Entering map:", Game.map.properties.name);
         this.diamonds = Engine.add.group();
         this.diamonds.enableBody = true;
-        Game.map.createFromTiles(this.terrain.DIAMOND, null, "diamond", 0, this.diamonds);
+        Game.map.createFromTiles(this.terrain.DIAMOND, null, "sprites", 0, this.diamonds);
         //  Add animations to all of the coin sprites
-        this.diamonds.callAll("animations.add", "animations", "still", [ 0, 1, 2, 3, 4, 5, 6, 7 ], 10, true);
+        this.diamonds.callAll("animations.add", "animations", "still", [ 40, 50, 60, 70, 41, 51, 61, 71 ], 10, true);
         this.diamonds.callAll("animations.play", "animations", "still");
         // add player
         Game.player = this._createPlayer(Game.map.properties.startX, Game.map.properties.startY);
@@ -211,6 +210,12 @@ Game.playState = {
             // Hatch?
             if (Game.map.properties.diamonds === Game.diamonds) {
                 this.sfx.hatch.play();
+                Engine.stage.backgroundColor = Phaser.Color.getColor(255, 255, 200);
+                var timer = Engine.time.create(false);
+                timer.loop(100, function() {
+                    Engine.stage.backgroundColor = Phaser.Color.getColor(0, 0, 0);
+                }, this);
+                timer.start();
             } else {
                 this.sfx.diamond.play();
             }
@@ -321,11 +326,11 @@ Game.playState = {
         }
     },
     _createPlayer: function(x, y) {
-        var player = Engine.add.sprite(Game.tileSize * x, Game.tileSize * y, "player");
-        player.animations.add("left", [ 7, 8, 9, 10, 11, 12, 13 ], 20, false);
-        player.animations.add("right", [ 14, 15, 16, 17, 18, 19, 20 ], 20, false);
-        player.animations.add("up", [ 7, 8, 9, 10, 11, 12, 13 ], 20, false);
-        player.animations.add("down", [ 14, 15, 16, 17, 18, 19, 20 ], 20, false);
+        var player = Engine.add.sprite(Game.tileSize * x, Game.tileSize * y, "sprites");
+        player.animations.add("left", [ 10, 11, 12, 13, 14, 15, 16 ], 20, false);
+        player.animations.add("right", [ 20, 21, 22, 23, 24, 25, 26 ], 20, false);
+        player.animations.add("up", [ 10, 11, 12, 13, 14, 15, 16 ], 20, false);
+        player.animations.add("down", [ 20, 21, 22, 23, 24, 25, 26 ], 20, false);
         player.animations.add("still", [ 0 ], 10, false);
         player.animations.add("blink", [ 0, 1, 2, 1 ], 10, false).onComplete.add(function() {
             player.animations.play("still");
@@ -357,7 +362,7 @@ Engine = new Phaser.Game({
     parent: "game"
 });
 
-//Engine = new Phaser.Game(Game.width, Game.height, Phaser.AUTO, "game");
+// Use Engine.state.getCurrentState() to get current state object
 Engine.state.add("load", Game.loadState);
 
 Engine.state.add("main", Game.mainState);
