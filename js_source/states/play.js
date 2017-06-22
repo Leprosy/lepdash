@@ -259,17 +259,18 @@ Game.playState = {
                         var tileRight = Game.map.getTile(x + 1, y);
                         var tileBellowRight = Game.map.getTile(x + 1, y + 1);
 
+                        // Conditions of hanging
+                        var notHangDirt = tileBellow.index !== this.terrain.DIRT && tileBellow.index !== this.terrain.DIRT2;
+                        var hangLeft = tileLeft.index === this.terrain.NULL && tileBellowLeft.index === this.terrain.NULL && !this._playerIn(tileLeft) && !this._playerIn(tileBellowLeft);
+                        var hangRight = tileRight.index === this.terrain.NULL && tileBellowRight.index === this.terrain.NULL && !this._playerIn(tileRight) && !this._playerIn(tileBellowRight);
+
                         // The objects can't be hanging on dirt
-                        if (tileBellow.index !== this.terrain.DIRT && tileBellow.index !== this.terrain.DIRT2) {
-                            if (tileLeft.index === this.terrain.NULL && tileBellowLeft.index === this.terrain.NULL
-                                    && !this._playerIn(tileLeft) && !this._playerIn(tileBellowLeft)) {
-                                this._mapMove(tile, tileLeft);
-                                tileLeft.properties.falling = true;
-                            } else if (tileRight.index === this.terrain.NULL && tileBellowRight.index === this.terrain.NULL
-                                    && !this._playerIn(tileRight) && !this._playerIn(tileBellowRight)) {
-                                this._mapMove(tile, tileRight);
-                                tileRight.properties.falling = true;
-                            }
+                        if (notHangDirt && hangLeft) {
+                            this._mapMove(tile, tileLeft);
+                            tileLeft.properties.falling = true;
+                        } else if (notHangDirt && hangRight) {
+                            this._mapMove(tile, tileRight);
+                            tileRight.properties.falling = true;
                         }
                     }
                 }
