@@ -1,7 +1,7 @@
 /**
- * Super fun gamez
+ * Super fun gamez engine
  */
-// Main namespaces and definitions
+// Engine namespaces and definitions
 var Engine = Engine || {};
 var Game = Game || {};
 Game.name = "_lepdash";
@@ -10,5 +10,5 @@ Game.width = 800;
 Game.height = 600;
 Game.speed = 200;
 
-/*User*/
+// Game specific vars
 Game.tileSize = 32; // tilebased games tile size

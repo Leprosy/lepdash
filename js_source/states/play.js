@@ -46,7 +46,7 @@ Game.playState = {
     },
 
     _create: function() {
-        // build map
+        // Build map
         Game.map = Engine.add.tilemap("map", Game.tileSize, Game.tileSize);
         Game.map.addTilesetImage("tiles", "tiles"); //"tiles name in JSON", "tileset" defined in preload state
         Game.layer = Game.map.createLayer("map");
@@ -55,6 +55,8 @@ Game.playState = {
         this.diamonds = Engine.add.group();
         this.diamonds.enableBody = true;
         Game.map.createFromTiles(this.terrain.DIAMOND, null, "sprites", 0, this.diamonds);
+
+        // Calculate map dimensions
 
         // Add animations to all of the coin sprites
         this.diamonds.callAll('animations.add', 'animations', "still", [40, 50, 60, 70, 41, 51, 61, 71], 10, true);
@@ -217,35 +219,33 @@ Game.playState = {
                 var tile = Game.map.getTile(x, y);
                 var tileBellow = Game.map.getTile(x, y + 1);
 
-                if (tile && tileBellow) {
-                    // we have a falling object
-                    if (tile.properties.falling) {
-                        if (tileBellow.index === this.terrain.NULL) {
-                            // Player crushed?
-                            if (this._playerIn(tileBellow) && Game.player.alive) {
-                                //Spawn explosion
-                                for (i = -1; i < 2; ++i) {
-                                    for (j = 0; j < 3; ++j) {
-                                        var xtile = Game.map.getTile(x + i, y + j);
+                // we have a falling object
+                if (tile.properties.falling) {
+                    if (tileBellow.index === this.terrain.NULL) {
+                        // Player crushed?
+                        if (this._playerIn(tileBellow) && Game.player.alive) {
+                            //Spawn explosion
+                            for (i = -1; i < 2; ++i) {
+                                for (j = 0; j < 3; ++j) {
+                                    var xtile = Game.map.getTile(x + i, y + j);
 
-                                        if (xtile.index !== this.terrain.STEEL) {
-                                            xtile.properties.falling = false;
-                                            this._mapRemove(xtile);
-                                        }
+                                    if (xtile.index !== this.terrain.STEEL) {
+                                        xtile.properties.falling = false;
+                                        this._mapRemove(xtile);
                                     }
                                 }
-
-                                this.sfx.explosion.play();
-                                Game.player.kill();
-                            } else {
-                                tile.properties.falling = false;
-                                tileBellow.properties.falling = true;
-                                this._mapMove(tile, tileBellow);
                             }
+
+                            this.sfx.explosion.play();
+                            Game.player.kill();
                         } else {
                             tile.properties.falling = false;
-                            this.sfx.boulder.play();
+                            tileBellow.properties.falling = true;
+                            this._mapMove(tile, tileBellow);
                         }
+                    } else {
+                        tile.properties.falling = false;
+                        this.sfx.boulder.play();
                     }
                 }
             }

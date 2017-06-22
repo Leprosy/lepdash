@@ -106,6 +106,7 @@ Game.playState = {
         var key = Engine.input.keyboard.addKey(Phaser.Keyboard.ESC);
         key.onDown.addOnce(function() {
             Game.lives--;
+            Game.diamonds = 0;
             if (Game.lives === -1) {
                 Engine.state.start("main");
             } else {
