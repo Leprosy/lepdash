@@ -18,8 +18,6 @@ Game.playState = {
         console.info(Game.name + " play loop");
     },
 
-    // Create your play logic here
-    /*User*/
     create: function() {
         console.info("Game params", Game);
 
