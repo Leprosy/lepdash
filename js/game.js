@@ -302,7 +302,8 @@ Game.playState = {
                         if (notHangDirt && hangLeft) {
                             this._mapMove(tile, tileLeft);
                             tileLeft.properties.falling = true;
-                        } else if (notHangDirt && hangRight) {
+                        }
+                        if (notHangDirt && hangRight) {
                             this._mapMove(tile, tileRight);
                             tileRight.properties.falling = true;
                         }
