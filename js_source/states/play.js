@@ -174,7 +174,7 @@ Game.playState = {
                     //Math.sign(Game.player.newX - Game.player.x) === -1 => pushing from left
                     var tileNext = Game.map.getTile(tile.x + Math.sign(Game.player.newX - Game.player.x), tile.y);
 
-                    if (tileNext.index === this.terrain.NULL && Engine.rnd.integerInRange(0,5) === 0) {
+                    if (tileNext.index === this.terrain.NULL && Engine.rnd.integerInRange(0, 3) === 0) { // Chance of pushing
                         Game.map.replace(this.terrain.BOULDER, this.terrain.NULL, tile.x, tile.y, 1, 1);
                         Game.map.replace(this.terrain.NULL, this.terrain.BOULDER, tileNext.x, tileNext.y, 1, 1);
                         this.sfx.boulder.play();
@@ -198,7 +198,6 @@ Game.playState = {
         Game.player.y = Game.player.newY;
     },
 
-    // TODO: need a way to calculate effective size of map to make this more efficient in the next couple of methods
     _checkFallings: function() {
         // Check falling objects, kill player if in the way
         for (x = 0; x < Game.map.width; ++x) {
@@ -212,6 +211,17 @@ Game.playState = {
                         if (tileBellow.index === this.terrain.NULL) {
                             // Player crushed?
                             if (this._playerIn(tileBellow) && Game.player.alive) {
+                                //Spawn explosion
+                                for (i = -1; i < 2; ++i) {
+                                    for (j = 0; j < 3; ++j) {
+                                        var xtile = Game.map.getTile(x + i, y + j);
+                                        if (xtile.index !== this.terrain.STEEL) {
+                                            xtile.properties.falling = false;
+                                            Game.map.replace(xtile.index, this.terrain.NULL, xtile.x, xtile.y, 1, 1);
+                                        }
+                                    }
+                                }
+
                                 this.sfx.explosion.play();
                                 Game.player.kill();
                             } else {
