@@ -156,15 +156,12 @@ Game.playState = {
             case this.terrain.DIRT:
             case this.terrain.DIRT2:
                 this._mapRemove(tile);
-                /*Game.map.replace(this.terrain.DIRT, this.terrain.NULL, tile.x, tile.y, 1, 1);
-                Game.map.replace(this.terrain.DIRT2, this.terrain.NULL, tile.x, tile.y, 1, 1);*/
                 this.sfx.dirt.play();
                 break;
 
             case this.terrain.DIAMOND:
                 Game.diamonds++;
                 this._mapRemove(tile);
-                //Game.map.replace(this.terrain.DIAMOND, this.terrain.NULL, tile.x, tile.y, 1, 1);
                 this.diamonds.getClosestTo(Game.player).kill();
 
                 // Hatch?
@@ -185,14 +182,12 @@ Game.playState = {
             case this.terrain.WALL:
             case this.terrain.BOULDER:
                 if (tile.index === this.terrain.BOULDER && Game.player.newY === Game.player.y && !tile.properties.falling) {
-                    console.log("trying to push");
                     //Math.sign(Game.player.newX - Game.player.x) === -1 => pushing from left
                     var tileNext = Game.map.getTile(tile.x + Math.sign(Game.player.newX - Game.player.x), tile.y);
 
                     if (tileNext.index === this.terrain.NULL && Engine.rnd.integerInRange(0, 3) === 0) { // Chance of pushing
                         this._mapMove(tile, tileNext);
-                        /*Game.map.replace(this.terrain.BOULDER, this.terrain.NULL, tile.x, tile.y, 1, 1);
-                        Game.map.replace(this.terrain.NULL, this.terrain.BOULDER, tileNext.x, tileNext.y, 1, 1);*/
+                        //tileNext.properties.moving = true; //Moving boulders can't hang
                         this.sfx.boulder.play();
                     } else {
                         Game.player.newX = Game.player.x;
@@ -231,9 +226,10 @@ Game.playState = {
                                 for (i = -1; i < 2; ++i) {
                                     for (j = 0; j < 3; ++j) {
                                         var xtile = Game.map.getTile(x + i, y + j);
+
                                         if (xtile.index !== this.terrain.STEEL) {
                                             xtile.properties.falling = false;
-                                            Game.map.replace(xtile.index, this.terrain.NULL, xtile.x, xtile.y, 1, 1);
+                                            this._mapRemove(xtile);
                                         }
                                     }
                                 }
@@ -243,8 +239,7 @@ Game.playState = {
                             } else {
                                 tile.properties.falling = false;
                                 tileBellow.properties.falling = true;
-                                Game.map.replace(this.terrain.BOULDER, this.terrain.NULL, tile.x, tile.y, 1, 1);
-                                Game.map.replace(this.terrain.NULL, this.terrain.BOULDER, tileBellow.x, tileBellow.y, 1, 1);
+                                this._mapMove(tile, tileBellow);
                             }
                         } else {
                             tile.properties.falling = false;
@@ -280,13 +275,11 @@ Game.playState = {
                             if (tileBellow.index !== this.terrain.DIRT && tileBellow.index !== this.terrain.DIRT2) {
                                 if (tileLeft.index === this.terrain.NULL && tileBellowLeft.index === this.terrain.NULL
                                         && !this._playerIn(tileLeft) && !this._playerIn(tileBellowLeft)) {
-                                    Game.map.replace(this.terrain.BOULDER, this.terrain.NULL, tile.x, tile.y, 1, 1);
-                                    Game.map.replace(this.terrain.NULL, this.terrain.BOULDER, tileLeft.x, tileLeft.y, 1, 1);
+                                    this._mapMove(tile, tileLeft);
                                     tileLeft.properties.falling = true;
                                 } else if (tileRight.index === this.terrain.NULL && tileBellowRight.index === this.terrain.NULL
                                         && !this._playerIn(tileRight) && !this._playerIn(tileBellowRight)) {
-                                    Game.map.replace(this.terrain.BOULDER, this.terrain.NULL, tile.x, tile.y, 1, 1);
-                                    Game.map.replace(this.terrain.NULL, this.terrain.BOULDER, tileRight.x, tileRight.y, 1, 1);
+                                    this._mapMove(tile, tileRight);
                                     tileRight.properties.falling = true;
                                 }
                             }
