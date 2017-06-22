@@ -8,8 +8,7 @@ Game.loadState = {
         /*User*/
         Engine.add.text(10, 10, "Loading...", {font: "20px Arial", fill: "#ffffff"});
         //Engine.load.image('bg', 'img/bg0.png');
-        Engine.load.spritesheet("player", "img/player.png", Game.tileSize, Game.tileSize);
-        Engine.load.spritesheet("diamond", "img/diamond.png", Game.tileSize, Game.tileSize);
+        Engine.load.spritesheet("sprites", "img/sprites.png", Game.tileSize, Game.tileSize);
         Engine.load.spritesheet("tiles", "img/tiles.png", Game.tileSize, Game.tileSize);
         Engine.load.tilemap("map", "maps/map1.json", null, Phaser.Tilemap.TILED_JSON);
 
