@@ -247,30 +247,28 @@ Game.playState = {
                 var tile = Game.map.getTile(x, y);
                 var tileBellow = Game.map.getTile(x, y + 1);
 
-                if (tile && tileBellow) {
-                    // We have a potential fallable object (and is not falling)
-                    if (tile.index === this.terrain.BOULDER && !tile.properties.falling) {
-                        // Nothing bellow, start falling
-                        if (tileBellow.index === this.terrain.NULL && !this._playerIn(tileBellow)) {
-                            tile.properties.falling = true;
-                        } else if (x > 0 && x < Game.map.width - 1 && !this._playerIn(tileBellow)) {
-                            // Is hanging, player is not bellow, start falling left-right
-                            var tileLeft = Game.map.getTile(x - 1, y);
-                            var tileBellowLeft = Game.map.getTile(x - 1, y + 1);
-                            var tileRight = Game.map.getTile(x + 1, y);
-                            var tileBellowRight = Game.map.getTile(x + 1, y + 1);
+                // We have a potential fallable object (and is not falling)
+                if (tile.index === this.terrain.BOULDER && !tile.properties.falling) {
+                    // Nothing bellow, start falling
+                    if (tileBellow.index === this.terrain.NULL && !this._playerIn(tileBellow)) {
+                        tile.properties.falling = true;
+                    } else if (x > 0 && x < Game.map.width - 1 && !this._playerIn(tileBellow)) {
+                        // Is hanging, player is not bellow, start falling left-right
+                        var tileLeft = Game.map.getTile(x - 1, y);
+                        var tileBellowLeft = Game.map.getTile(x - 1, y + 1);
+                        var tileRight = Game.map.getTile(x + 1, y);
+                        var tileBellowRight = Game.map.getTile(x + 1, y + 1);
 
-                            // The objects can't be hanging on dirt
-                            if (tileBellow.index !== this.terrain.DIRT && tileBellow.index !== this.terrain.DIRT2) {
-                                if (tileLeft.index === this.terrain.NULL && tileBellowLeft.index === this.terrain.NULL
-                                        && !this._playerIn(tileLeft) && !this._playerIn(tileBellowLeft)) {
-                                    this._mapMove(tile, tileLeft);
-                                    tileLeft.properties.falling = true;
-                                } else if (tileRight.index === this.terrain.NULL && tileBellowRight.index === this.terrain.NULL
-                                        && !this._playerIn(tileRight) && !this._playerIn(tileBellowRight)) {
-                                    this._mapMove(tile, tileRight);
-                                    tileRight.properties.falling = true;
-                                }
+                        // The objects can't be hanging on dirt
+                        if (tileBellow.index !== this.terrain.DIRT && tileBellow.index !== this.terrain.DIRT2) {
+                            if (tileLeft.index === this.terrain.NULL && tileBellowLeft.index === this.terrain.NULL
+                                    && !this._playerIn(tileLeft) && !this._playerIn(tileBellowLeft)) {
+                                this._mapMove(tile, tileLeft);
+                                tileLeft.properties.falling = true;
+                            } else if (tileRight.index === this.terrain.NULL && tileBellowRight.index === this.terrain.NULL
+                                    && !this._playerIn(tileRight) && !this._playerIn(tileBellowRight)) {
+                                this._mapMove(tile, tileRight);
+                                tileRight.properties.falling = true;
                             }
                         }
                     }

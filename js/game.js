@@ -263,7 +263,7 @@ Game.playState = {
                         // Player crushed?
                         if (this._playerIn(tileBellow) && Game.player.alive) {
                             //Spawn explosion
-                            this._explode(tile, true);
+                            this._explode(tile);
                         } else {
                             tile.properties.falling = false;
                             tileBellow.properties.falling = true;
@@ -283,27 +283,25 @@ Game.playState = {
             for (y = Game.map.height - 2; y >= 0; --y) {
                 var tile = Game.map.getTile(x, y);
                 var tileBellow = Game.map.getTile(x, y + 1);
-                if (tile && tileBellow) {
-                    // We have a potential fallable object (and is not falling)
-                    if (tile.index === this.terrain.BOULDER && !tile.properties.falling) {
-                        // Nothing bellow, start falling
-                        if (tileBellow.index === this.terrain.NULL && !this._playerIn(tileBellow)) {
-                            tile.properties.falling = true;
-                        } else if (x > 0 && x < Game.map.width - 1 && !this._playerIn(tileBellow)) {
-                            // Is hanging, player is not bellow, start falling left-right
-                            var tileLeft = Game.map.getTile(x - 1, y);
-                            var tileBellowLeft = Game.map.getTile(x - 1, y + 1);
-                            var tileRight = Game.map.getTile(x + 1, y);
-                            var tileBellowRight = Game.map.getTile(x + 1, y + 1);
-                            // The objects can't be hanging on dirt
-                            if (tileBellow.index !== this.terrain.DIRT && tileBellow.index !== this.terrain.DIRT2) {
-                                if (tileLeft.index === this.terrain.NULL && tileBellowLeft.index === this.terrain.NULL && !this._playerIn(tileLeft) && !this._playerIn(tileBellowLeft)) {
-                                    this._mapMove(tile, tileLeft);
-                                    tileLeft.properties.falling = true;
-                                } else if (tileRight.index === this.terrain.NULL && tileBellowRight.index === this.terrain.NULL && !this._playerIn(tileRight) && !this._playerIn(tileBellowRight)) {
-                                    this._mapMove(tile, tileRight);
-                                    tileRight.properties.falling = true;
-                                }
+                // We have a potential fallable object (and is not falling)
+                if (tile.index === this.terrain.BOULDER && !tile.properties.falling) {
+                    // Nothing bellow, start falling
+                    if (tileBellow.index === this.terrain.NULL && !this._playerIn(tileBellow)) {
+                        tile.properties.falling = true;
+                    } else if (x > 0 && x < Game.map.width - 1 && !this._playerIn(tileBellow)) {
+                        // Is hanging, player is not bellow, start falling left-right
+                        var tileLeft = Game.map.getTile(x - 1, y);
+                        var tileBellowLeft = Game.map.getTile(x - 1, y + 1);
+                        var tileRight = Game.map.getTile(x + 1, y);
+                        var tileBellowRight = Game.map.getTile(x + 1, y + 1);
+                        // The objects can't be hanging on dirt
+                        if (tileBellow.index !== this.terrain.DIRT && tileBellow.index !== this.terrain.DIRT2) {
+                            if (tileLeft.index === this.terrain.NULL && tileBellowLeft.index === this.terrain.NULL && !this._playerIn(tileLeft) && !this._playerIn(tileBellowLeft)) {
+                                this._mapMove(tile, tileLeft);
+                                tileLeft.properties.falling = true;
+                            } else if (tileRight.index === this.terrain.NULL && tileBellowRight.index === this.terrain.NULL && !this._playerIn(tileRight) && !this._playerIn(tileBellowRight)) {
+                                this._mapMove(tile, tileRight);
+                                tileRight.properties.falling = true;
                             }
                         }
                     }
@@ -313,18 +311,18 @@ Game.playState = {
     },
     _explode: function(tile, killPlayer) {
         // Spawn explosion centered on tile
+        this.sfx.explosion.play();
         for (i = -1; i < 2; ++i) {
             for (j = 0; j < 3; ++j) {
                 var xtile = Game.map.getTile(tile.x + i, tile.y + j);
                 if (xtile.index !== this.terrain.STEEL) {
                     xtile.properties.falling = false;
                     this._mapRemove(xtile);
+                    if (this._playerIn(xtile)) {
+                        Game.player.kill();
+                    }
                 }
             }
-        }
-        if (killPlayer) {
-            this.sfx.explosion.play();
-            Game.player.kill();
         }
     },
     _createPlayer: function(x, y) {
