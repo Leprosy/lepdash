@@ -23,8 +23,6 @@ Game.tileSize = 32;
 Game.loadState = {
     preload: function() {
         console.info(Game.name + " loading assets");
-        // Put your assets loader logic here...
-        /*User*/
         Engine.add.text(10, 10, "Loading...", {
             font: "20px Arial",
             fill: "#ffffff"
@@ -52,8 +50,6 @@ Game.mainState = {
         console.info(Game.name + " main menu");
     },
     create: function() {
-        // Create your main menu logic here...
-        /*User*/
         // Draw main menu
         Engine.add.text(10, 10, Game.name, {
             font: "20px Arial",
@@ -97,8 +93,6 @@ Game.playState = {
     preload: function() {
         console.info(Game.name + " play loop");
     },
-    // Create your play logic here
-    /*User*/
     create: function() {
         console.info("Game params", Game);
         // SFX
@@ -132,14 +126,14 @@ Game.playState = {
         this.diamonds = Engine.add.group();
         this.diamonds.enableBody = true;
         Game.map.createFromTiles(this.terrain.DIAMOND, null, "sprites", 0, this.diamonds);
-        //  Add animations to all of the coin sprites
+        // Add animations to all of the coin sprites
         this.diamonds.callAll("animations.add", "animations", "still", [ 40, 50, 60, 70, 41, 51, 61, 71 ], 10, true);
         this.diamonds.callAll("animations.play", "animations", "still");
-        // add player
+        // Add player
         Game.player = this._createPlayer(Game.map.properties.startX, Game.map.properties.startY);
         //Game.player.animations.play("tap");
         this.cursors = Engine.input.keyboard.createCursorKeys();
-        // add HUD
+        // Add HUD
         Game.HUD = Engine.add.text(10, Game.height - 15, "", {
             font: "15px Arial",
             fill: "#ffffff"
@@ -174,7 +168,6 @@ Game.playState = {
     },
     _checkStatus: function() {},
     _checkInput: function() {
-        if (!Game.player.alive) return;
         if (this.cursors.left.isDown) {
             Game.player.newX -= Game.tileSize;
             Game.player.play("left");
@@ -191,6 +184,14 @@ Game.playState = {
             Game.player.play("still");
         }
     },
+    _mapRemove: function(tile) {
+        Game.map.replace(tile.index, this.terrain.NULL, tile.x, tile.y, 1, 1);
+    },
+    _mapMove: function(tile1, tile2) {
+        var index = tile1.index;
+        Game.map.replace(index, this.terrain.NULL, tile1.x, tile1.y, 1, 1);
+        Game.map.replace(this.terrain.NULL, index, tile2.x, tile2.y, 1, 1);
+    },
     _checkMapCollision: function() {
         // First detect if player can move
         var tile = Game.map.getTileWorldXY(Game.player.newX, Game.player.newY);
@@ -198,14 +199,16 @@ Game.playState = {
         switch (tile.index) {
           case this.terrain.DIRT:
           case this.terrain.DIRT2:
-            Game.map.replace(this.terrain.DIRT, this.terrain.NULL, tile.x, tile.y, 1, 1);
-            Game.map.replace(this.terrain.DIRT2, this.terrain.NULL, tile.x, tile.y, 1, 1);
+            this._mapRemove(tile);
+            /*Game.map.replace(this.terrain.DIRT, this.terrain.NULL, tile.x, tile.y, 1, 1);
+                Game.map.replace(this.terrain.DIRT2, this.terrain.NULL, tile.x, tile.y, 1, 1);*/
             this.sfx.dirt.play();
             break;
 
           case this.terrain.DIAMOND:
             Game.diamonds++;
-            Game.map.replace(this.terrain.DIAMOND, this.terrain.NULL, tile.x, tile.y, 1, 1);
+            this._mapRemove(tile);
+            //Game.map.replace(this.terrain.DIAMOND, this.terrain.NULL, tile.x, tile.y, 1, 1);
             this.diamonds.getClosestTo(Game.player).kill();
             // Hatch?
             if (Game.map.properties.diamonds === Game.diamonds) {
@@ -230,8 +233,9 @@ Game.playState = {
                 var tileNext = Game.map.getTile(tile.x + Math.sign(Game.player.newX - Game.player.x), tile.y);
                 if (tileNext.index === this.terrain.NULL && Engine.rnd.integerInRange(0, 3) === 0) {
                     // Chance of pushing
-                    Game.map.replace(this.terrain.BOULDER, this.terrain.NULL, tile.x, tile.y, 1, 1);
-                    Game.map.replace(this.terrain.NULL, this.terrain.BOULDER, tileNext.x, tileNext.y, 1, 1);
+                    this._mapMove(tile, tileNext);
+                    /*Game.map.replace(this.terrain.BOULDER, this.terrain.NULL, tile.x, tile.y, 1, 1);
+                        Game.map.replace(this.terrain.NULL, this.terrain.BOULDER, tileNext.x, tileNext.y, 1, 1);*/
                     this.sfx.boulder.play();
                 } else {
                     Game.player.newX = Game.player.x;
