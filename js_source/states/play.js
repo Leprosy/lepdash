@@ -82,7 +82,7 @@ Game.playState = {
                 this._checkMapCollision();
             }
 
-            this._checkFallings();
+            this._updateFallings();
             this._setFallings();
             this._checkStatus();
             this._updateHUD();
@@ -191,7 +191,7 @@ Game.playState = {
 
                     if (tileNext.index === this.terrain.NULL && Engine.rnd.integerInRange(0, 2) === 0) { // Chance of pushing
                         this._mapMove(tile, tileNext);
-                        //tileNext.properties.moving = true; //Moving boulders can't hang
+                        tileNext.properties.moving = true; //Moving boulders can't hang
                         this.sfx.boulder.play();
                     } else {
                         Game.player.newX = Game.player.x;
@@ -213,7 +213,7 @@ Game.playState = {
         Game.player.y = Game.player.newY;
     },
 
-    _checkFallings: function() {
+    _updateFallings: function() {
         // Check falling objects, kill player if in the way
         for (x = 0; x < Game.map.width; ++x) {
             for (y = Game.map.height - 2; y >= 0; --y) {
@@ -267,12 +267,20 @@ Game.playState = {
 
                         // The objects can't be hanging on dirt
                         if (notHangDirt && hangLeft) {
-                            this._mapMove(tile, tileLeft);
-                            tileLeft.properties.falling = true;
+                            if (tile.properties.moving) {
+                                tile.properties.moving = false;
+                            } else {
+                                this._mapMove(tile, tileLeft);
+                                tileLeft.properties.falling = true;
+                            }
                         }
                         if (notHangDirt && hangRight) {
-                            this._mapMove(tile, tileRight);
-                            tileRight.properties.falling = true;
+                            if (tile.properties.moving) {
+                                tile.properties.moving = false;
+                            } else {
+                                this._mapMove(tile, tileRight);
+                                tileRight.properties.falling = true;
+                            }
                         }
                     }
                 }

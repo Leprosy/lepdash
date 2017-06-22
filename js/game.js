@@ -150,7 +150,7 @@ Game.playState = {
                 this._checkInput();
                 this._checkMapCollision();
             }
-            this._checkFallings();
+            this._updateFallings();
             this._setFallings();
             this._checkStatus();
             this._updateHUD();
@@ -233,7 +233,8 @@ Game.playState = {
                 if (tileNext.index === this.terrain.NULL && Engine.rnd.integerInRange(0, 2) === 0) {
                     // Chance of pushing
                     this._mapMove(tile, tileNext);
-                    //tileNext.properties.moving = true; //Moving boulders can't hang
+                    tileNext.properties.moving = true;
+                    //Moving boulders can't hang
                     this.sfx.boulder.play();
                 } else {
                     Game.player.newX = Game.player.x;
@@ -252,7 +253,7 @@ Game.playState = {
         Game.player.x = Game.player.newX;
         Game.player.y = Game.player.newY;
     },
-    _checkFallings: function() {
+    _updateFallings: function() {
         // Check falling objects, kill player if in the way
         for (x = 0; x < Game.map.width; ++x) {
             for (y = Game.map.height - 2; y >= 0; --y) {
@@ -301,12 +302,20 @@ Game.playState = {
                         var hangRight = tileRight.index === this.terrain.NULL && tileBellowRight.index === this.terrain.NULL && !this._playerIn(tileRight) && !this._playerIn(tileBellowRight);
                         // The objects can't be hanging on dirt
                         if (notHangDirt && hangLeft) {
-                            this._mapMove(tile, tileLeft);
-                            tileLeft.properties.falling = true;
+                            if (tile.properties.moving) {
+                                tile.properties.moving = false;
+                            } else {
+                                this._mapMove(tile, tileLeft);
+                                tileLeft.properties.falling = true;
+                            }
                         }
                         if (notHangDirt && hangRight) {
-                            this._mapMove(tile, tileRight);
-                            tileRight.properties.falling = true;
+                            if (tile.properties.moving) {
+                                tile.properties.moving = false;
+                            } else {
+                                this._mapMove(tile, tileRight);
+                                tileRight.properties.falling = true;
+                            }
                         }
                     }
                 }
@@ -322,12 +331,21 @@ Game.playState = {
                 if (xtile.index !== this.terrain.STEEL) {
                     xtile.properties.falling = false;
                     this._mapRemove(xtile);
+                    this._createExplosion(xtile.x, xtile.y);
                     if (this._playerIn(xtile)) {
                         Game.player.kill();
                     }
                 }
             }
         }
+    },
+    _createExplosion: function(x, y) {
+        var explosion = Engine.add.sprite(Game.tileSize * x, Game.tileSize * y, "sprites");
+        explosion.animations.add("still", [ 78, 68, 58, 48, 38 ], 8, false).onComplete.add(function() {
+            explosion.kill();
+        });
+        explosion.animations.play("still");
+        return explosion;
     },
     _createPlayer: function(x, y) {
         var player = Engine.add.sprite(Game.tileSize * x, Game.tileSize * y, "sprites");
