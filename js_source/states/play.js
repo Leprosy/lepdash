@@ -34,7 +34,7 @@ Game.playState = {
         key.onDown.addOnce(function() {
             Game.lives--;
 
-            if (Game.lives == -1) {
+            if (Game.lives === -1) {
                 Engine.state.start("main");
             } else {
                 Engine.state.start("play");
@@ -98,7 +98,7 @@ Game.playState = {
     _updateHUD: function() {
         Game.HUD.text = "Map:" + Game.level + " Diamonds: " + Game.diamonds + " of " + Game.map.properties.diamonds + " Lives: " + Game.lives;
         if (!Game.player.alive) {
-            if (Game.lives == 0) {
+            if (Game.lives === 0) {
                 Game.HUD.text += " GAME OVER";
             } else {
                 Game.HUD.text += " PRESS ESC TO RESTART LEVEL";
