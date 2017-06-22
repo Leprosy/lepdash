@@ -225,7 +225,7 @@ Game.playState = {
                         // Player crushed?
                         if (this._playerIn(tileBellow) && Game.player.alive) {
                             //Spawn explosion
-                            this._explode(tile, true);
+                            this._explode(tile);
                         } else {
                             tile.properties.falling = false;
                             tileBellow.properties.falling = true;
@@ -281,6 +281,8 @@ Game.playState = {
 
     _explode: function(tile, killPlayer) {
         // Spawn explosion centered on tile
+        this.sfx.explosion.play();
+
         for (i = -1; i < 2; ++i) {
             for (j = 0; j < 3; ++j) {
                 var xtile = Game.map.getTile(tile.x + i, tile.y + j);
@@ -288,13 +290,12 @@ Game.playState = {
                 if (xtile.index !== this.terrain.STEEL) {
                     xtile.properties.falling = false;
                     this._mapRemove(xtile);
+
+                    if (this._playerIn(xtile)) {
+                        Game.player.kill();
+                    }
                 }
             }
-        }
-
-        if (killPlayer) {
-            this.sfx.explosion.play();
-            Game.player.kill();
         }
     },
 
