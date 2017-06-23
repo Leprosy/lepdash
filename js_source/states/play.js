@@ -11,7 +11,8 @@ Game.playState = {
         DIRT: 5,
         DIRT2: 6,
         BOULDER: 7,
-        DIAMOND: 8
+        DIAMOND: 8,
+        EXPLOSION: 9
     },
 
     preload: function() {
@@ -121,6 +122,7 @@ Game.playState = {
         } */
     },
 
+    // Check the user key input and calculates new position
     _checkInput: function() {
         if (this.cursors.left.isDown) {
             Game.player.newX -= Game.tileSize;
@@ -139,17 +141,20 @@ Game.playState = {
         }
     },
 
-    _mapRemove: function(tile) {
-        Game.map.replace(tile.index, this.terrain.NULL, tile.x, tile.y, 1, 1);
+    // Removes a tile(or replaces with another)
+    _mapRemove: function(tile, type) {
+        var terrain = type || this.terrain.NULL;
+        Game.map.replace(tile.index, terrain, tile.x, tile.y, 1, 1);
     },
 
+    // Moves a tile
     _mapMove: function(tile1, tile2) {
         var index = tile1.index;
         Game.map.replace(index, this.terrain.NULL, tile1.x, tile1.y, 1, 1);
         Game.map.replace(this.terrain.NULL, index, tile2.x, tile2.y, 1, 1);
     },
 
-
+    // Check if the new player position is allowed 
     _checkMapCollision: function() {
         // First detect if player can move
         var tile = Game.map.getTileWorldXY(Game.player.newX, Game.player.newY);
@@ -213,6 +218,7 @@ Game.playState = {
         Game.player.y = Game.player.newY;
     },
 
+    // Update position of objects that are already falling
     _updateFallings: function() {
         // Check falling objects, kill player if in the way
         for (x = 0; x < Game.map.width; ++x) {
@@ -241,6 +247,7 @@ Game.playState = {
         }
     },
 
+    // Set the "falling" condition on gravity affected objects
     _setFallings: function() {
         // Last, mark objects that will start falling next turn
         for (x = 0; x < Game.map.width; ++x) {
@@ -288,8 +295,8 @@ Game.playState = {
         }
     },
 
+    // Spawn a explosion centered on tile. If the player is inside, it's gonna get killed...
     _explode: function(tile, killPlayer) {
-        // Spawn explosion centered on tile
         this.sfx.explosion.play();
 
         for (i = -1; i < 2; ++i) {
@@ -298,7 +305,7 @@ Game.playState = {
 
                 if (xtile.index !== this.terrain.STEEL) {
                     xtile.properties.falling = false;
-                    this._mapRemove(xtile);
+                    this._mapRemove(xtile, this.terrain.EXPLOSION);
                     this._createExplosion(xtile.x, xtile.y);
 
                     if (this._playerIn(xtile)) {
@@ -309,15 +316,21 @@ Game.playState = {
         }
     },
 
+    // Spawn explosion sprite, animates and clean it. Neat.
     _createExplosion: function(x, y) {
+        var _this = this;
         var explosion = Engine.add.sprite(Game.tileSize * x, Game.tileSize * y, "sprites");
         explosion.animations.add("still", [78, 68, 58, 48, 38], 8, false).onComplete.add(function() {
+            var x = explosion.x / Game.tileSize;
+            var y = explosion.y / Game.tileSize;
+            _this._mapRemove(Game.map.getTile(x, y));
             explosion.kill();
         });
         explosion.animations.play("still");
         return explosion;
     },
 
+    // Creates the player sprite and define it's animations
     _createPlayer: function(x, y) {
         var player = Engine.add.sprite(Game.tileSize * x, Game.tileSize * y, "sprites");
         player.animations.add("left", [10, 11, 12, 13, 14, 15, 16], 20, false);
@@ -337,6 +350,7 @@ Game.playState = {
         return player;
     },
 
+    // Check if the player is in a certain tile
     _playerIn: function(tile) {
         var playerPos = {x: Game.player.x / Game.tileSize, y: Game.player.y / Game.tileSize};
         return playerPos.x === tile.x && playerPos.y === tile.y;
