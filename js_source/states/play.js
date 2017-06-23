@@ -179,7 +179,7 @@ Game.playState = {
                     Game.diamonds++;
                     this._mapRemove(tile);
                     this.diamonds.getClosestTo(Game.player).kill();
-    
+
                     // Hatch?
                     if (Game.map.properties.diamonds === Game.diamonds) {
                         this.sfx.hatch.play();
