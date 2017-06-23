@@ -8,7 +8,7 @@ Game.name = "_lepdash";
 Game.version = "0.1";
 Game.width = 800;
 Game.height = 600;
-Game.speed = 200;
+Game.speed = 150;
 
 // Game specific vars
 Game.tileSize = 32; // tilebased games tile size
