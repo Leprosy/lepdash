@@ -128,7 +128,6 @@ Game.playState = {
         this.diamonds = Engine.add.group();
         this.diamonds.enableBody = true;
         Game.map.createFromTiles(this.terrain.DIAMOND, null, "sprites", 0, this.diamonds);
-        // Calculate map dimensions
         // Add animations to all of the coin sprites
         this.diamonds.callAll("animations.add", "animations", "still", [ 40, 50, 60, 70, 41, 51, 61, 71 ], 10, true);
         this.diamonds.callAll("animations.play", "animations", "still");
@@ -136,6 +135,8 @@ Game.playState = {
         Game.player = this._createPlayer(Game.map.properties.startX, Game.map.properties.startY);
         //Game.player.animations.play("tap");
         this.cursors = Engine.input.keyboard.createCursorKeys();
+        // Add goal
+        Game.finish = this._createFinish(Game.map.properties.finishX, Game.map.properties.finishY);
         // Add HUD
         Game.HUD = Engine.add.text(10, Game.height - 15, "", {
             font: "15px Arial",
@@ -234,6 +235,8 @@ Game.playState = {
                         Engine.stage.backgroundColor = Phaser.Color.getColor(0, 0, 0);
                     }, this);
                     timer.start();
+                    Game.finish.animations.play("ready");
+                    this._mapRemove(Game.map.getTile(Game.map.properties.finishX, Game.map.properties.finishY));
                 } else {
                     this.sfx.diamond.play();
                 }
@@ -269,6 +272,10 @@ Game.playState = {
         // Set new position(if the player can move)
         Game.player.x = Game.player.newX;
         Game.player.y = Game.player.newY;
+        // YOU WON?
+        if (Game.player.x / Game.tileSize === Game.map.properties.finishX && Game.player.y / Game.tileSize === Game.map.properties.finishY) {
+            alert("YOU WON");
+        }
     },
     // Update position of objects that are already falling
     _updateFallings: function() {
@@ -406,6 +413,15 @@ Game.playState = {
         player.newX = player.x;
         player.newY = player.y;
         return player;
+    },
+    // Create finish level object
+    _createFinish: function(x, y) {
+        this._mapRemove(Game.map.getTile(x, y), this.terrain.STEEL);
+        var finish = Engine.add.sprite(Game.tileSize * x, Game.tileSize * y, "sprites");
+        finish.animations.add("still", [ 30 ], 1, false);
+        finish.animations.add("ready", [ 30, 31 ], 5, true);
+        finish.animations.play("still");
+        return finish;
     },
     // Check if the player is in a certain tile
     _playerIn: function(tile) {
