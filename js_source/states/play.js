@@ -304,8 +304,6 @@ Game.playState = {
                 var xtile = Game.map.getTile(tile.x + i, tile.y + j);
 
                 if (xtile.index !== this.terrain.STEEL) {
-                    xtile.properties.falling = false;
-                    this._mapRemove(xtile, this.terrain.EXPLOSION);
                     this._createExplosion(xtile.x, xtile.y);
 
                     if (this._playerIn(xtile)) {
@@ -318,6 +316,18 @@ Game.playState = {
 
     // Spawn explosion sprite, animates and clean it. Neat.
     _createExplosion: function(x, y) {
+        // Do some cleanup(no falling, remove diamonds)
+        var tile = Game.map.getTile(x, y);
+        tile.properties.falling = false;
+
+        if (tile.index === this.terrain.DIAMOND) {
+            var dia = this.diamonds.getClosestTo({x: tile.x * Game.tileSize, y: tile.y * Game.tileSize});
+            console.log(dia)
+            dia.kill();
+        }
+
+        this._mapRemove(tile, this.terrain.EXPLOSION);
+
         var _this = this;
         var explosion = Engine.add.sprite(Game.tileSize * x, Game.tileSize * y, "sprites");
         explosion.animations.add("still", [78, 68, 58, 48, 38], 8, false).onComplete.add(function() {
