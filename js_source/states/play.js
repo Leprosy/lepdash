@@ -149,6 +149,13 @@ Game.playState = {
 
     // Moves a tile
     _mapMove: function(tile1, tile2) {
+        // Diamond. move group sprite
+        if (tile1.index === this.terrain.DIAMOND) {
+            var dia = this.diamonds.getClosestTo({x: tile1.x * Game.tileSize, y: tile1.y * Game.tileSize});
+            dia.x = tile2.x * Game.tileSize;
+            dia.y = tile2.y * Game.tileSize;
+        }
+
         var index = tile1.index;
         Game.map.replace(index, this.terrain.NULL, tile1.x, tile1.y, 1, 1);
         Game.map.replace(this.terrain.NULL, index, tile2.x, tile2.y, 1, 1);
@@ -240,7 +247,13 @@ Game.playState = {
                         }
                     } else {
                         tile.properties.falling = false;
-                        this.sfx.boulder.play();
+
+                        // Diamond or boulder sound
+                        if (tile.index === this.terrain.BOULDER) {
+                            this.sfx.boulder.play();
+                        } else if (tile.index === this.terrain.DIAMOND) {
+                            this.sfx["diamond" + Engine.rnd.integerInRange(0, 7)].play();
+                        }
                     }
                 }
             }
@@ -256,7 +269,7 @@ Game.playState = {
                 var tileBellow = Game.map.getTile(x, y + 1);
 
                 // We have a potential fallable object (and is not falling)
-                if (tile.index === this.terrain.BOULDER && !tile.properties.falling) {
+                if (this._isFallable(tile)) {
                     // Nothing bellow, start falling
                     if (tileBellow.index === this.terrain.NULL && !this._playerIn(tileBellow)) {
                         tile.properties.falling = true;
@@ -295,6 +308,11 @@ Game.playState = {
         }
     },
 
+    // Check if a tile is fallable
+    _isFallable: function(tile) {
+        return ([this.terrain.DIAMOND, this.terrain.BOULDER].indexOf(tile.index) >= 0 && !tile.properties.falling);
+    },
+
     // Spawn a explosion centered on tile. If the player is inside, it's gonna get killed...
     _explode: function(tile, killPlayer) {
         this.sfx.explosion.play();
@@ -322,7 +340,6 @@ Game.playState = {
 
         if (tile.index === this.terrain.DIAMOND) {
             var dia = this.diamonds.getClosestTo({x: tile.x * Game.tileSize, y: tile.y * Game.tileSize});
-            console.log(dia)
             dia.kill();
         }
 
