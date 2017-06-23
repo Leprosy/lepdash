@@ -221,20 +221,22 @@ Game.playState = {
             break;
 
           case this.terrain.DIAMOND:
-            Game.diamonds++;
-            this._mapRemove(tile);
-            this.diamonds.getClosestTo(Game.player).kill();
-            // Hatch?
-            if (Game.map.properties.diamonds === Game.diamonds) {
-                this.sfx.hatch.play();
-                Engine.stage.backgroundColor = Phaser.Color.getColor(255, 255, 200);
-                var timer = Engine.time.create(false);
-                timer.loop(100, function() {
-                    Engine.stage.backgroundColor = Phaser.Color.getColor(0, 0, 0);
-                }, this);
-                timer.start();
-            } else {
-                this.sfx.diamond.play();
+            if (!tile.properties.falling) {
+                Game.diamonds++;
+                this._mapRemove(tile);
+                this.diamonds.getClosestTo(Game.player).kill();
+                // Hatch?
+                if (Game.map.properties.diamonds === Game.diamonds) {
+                    this.sfx.hatch.play();
+                    Engine.stage.backgroundColor = Phaser.Color.getColor(255, 255, 200);
+                    var timer = Engine.time.create(false);
+                    timer.loop(100, function() {
+                        Engine.stage.backgroundColor = Phaser.Color.getColor(0, 0, 0);
+                    }, this);
+                    timer.start();
+                } else {
+                    this.sfx.diamond.play();
+                }
             }
             break;
 
