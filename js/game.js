@@ -157,13 +157,21 @@ Game.playState = {
             this._updateHUD();
             this.updateTime = this.time.now + Game.speed;
         }
-        // Game timer decrease
-        if (this.timerTime < this.time.now) {
-            if (Game.time > 0) Game.time--;
-            if (Game.time === 0 && Game.player.alive) {
-                this._explode(Game.map.getTile(Game.player.x / Game.tileSize, Game.player.y / Game.tileSize - 1));
-            } else {
-                this.timerTime = this.time.now + 8 * Game.speed;
+        // These timers start when player hatches
+        if (Game.player.animations.name !== "start" && Game.player.animations.name !== "hatch") {
+            // Game timer decrease
+            if (this.timerTime < this.time.now) {
+                if (Game.time > 0) Game.time--;
+                if (Game.time === 0 && Game.player.alive) {
+                    this._explode(Game.map.getTile(Game.player.x / Game.tileSize, Game.player.y / Game.tileSize - 1));
+                } else {
+                    this.timerTime = this.time.now + 8 * Game.speed;
+                }
+            }
+            // Player tap animation(bored)
+            if (this.tapTime < this.time.now) {
+                Game.player.play("tap");
+                this.tapTime = this.time.now + Game.speed * 50;
             }
         }
     },
@@ -194,7 +202,10 @@ Game.playState = {
             Game.player.newY += Game.tileSize;
             Game.player.play("down");
         } else {
-            Game.player.play("still");
+            if (Game.player.animations.name !== "tap") {
+                // Don't interrupt bored tap
+                Game.player.play("still");
+            }
         }
     },
     // Removes a tile(or replaces with another)
@@ -221,6 +232,10 @@ Game.playState = {
     _checkMapCollision: function() {
         // First detect if player can move
         var tile = Game.map.getTileWorldXY(Game.player.newX, Game.player.newY);
+        // Additional: if player moved, tap time reset
+        if (Game.player.newX !== Game.player.x || Game.player.newY !== Game.player.y) {
+            this.tapTime = this.time.now + Game.speed * 50;
+        }
         switch (tile.index) {
           case this.terrain.DIRT:
           case this.terrain.DIRT2:
