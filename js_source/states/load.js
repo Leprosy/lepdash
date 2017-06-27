@@ -7,7 +7,7 @@ Game.loadState = {
         //Engine.load.image('bg', 'img/bg0.png');
         Engine.load.spritesheet("sprites", "img/sprites.png", Game.tileSize, Game.tileSize);
         Engine.load.spritesheet("tiles", "img/tiles.png", Game.tileSize, Game.tileSize);
-        Engine.load.tilemap("map", "maps/map1.json", null, Phaser.Tilemap.TILED_JSON);
+        Engine.load.tilemap("map", "maps/map.json", null, Phaser.Tilemap.TILED_JSON);
 
         Engine.load.audio("theme", "snd/theme.ogg");
         Engine.load.audio("boulder", "snd/boulder.ogg");

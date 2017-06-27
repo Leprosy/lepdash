@@ -50,24 +50,25 @@ Game.playState = {
         // Build map
         Game.map = Engine.add.tilemap("map", Game.tileSize, Game.tileSize);
         Game.map.addTilesetImage("tiles", "tiles"); //"tiles name in JSON", "tileset" defined in preload state
-        Game.layer = Game.map.createLayer("map");
+        Game.map.setLayer("map" + Game.level);
+        Game.layer = Game.map.createLayer("map" + Game.level);
         Game.layer.resizeWorld();
-        console.info("Entering map:", Game.map.properties.name);
+        this.mapProps = Game.map.layers[Game.level - 1].properties;
+
+        // Add diamonds
         this.diamonds = Engine.add.group();
         this.diamonds.enableBody = true;
-        Game.map.createFromTiles(this.terrain.DIAMOND, null, "sprites", 0, this.diamonds);
-
-        // Add animations to all of the coin sprites
+        Game.map.createFromTiles(this.terrain.DIAMOND, null, "sprites", Game.level - 1, this.diamonds);
         this.diamonds.callAll('animations.add', 'animations', "still", [40, 50, 60, 70, 41, 51, 61, 71], 10, true);
         this.diamonds.callAll('animations.play', 'animations', "still");
 
         // Add player
-        Game.player = this._createPlayer(Game.map.properties.startX, Game.map.properties.startY);
+        Game.player = this._createPlayer(this.mapProps.startX, this.mapProps.startY);
         //Game.player.animations.play("tap");
         this.cursors = Engine.input.keyboard.createCursorKeys();
 
         // Add goal
-        Game.finish = this._createFinish(Game.map.properties.finishX, Game.map.properties.finishY);
+        Game.finish = this._createFinish(this.mapProps.finishX, this.mapProps.finishY);
 
         // Add HUD
         Game.HUD = Engine.add.text(10, Game.height - 15, "", {font: "15px Arial", fill: "#ffffff"});
@@ -101,7 +102,8 @@ Game.playState = {
 
 
     _updateHUD: function() {
-        Game.HUD.text = "Map:" + Game.level + " Diamonds: " + Game.diamonds + " of " + Game.map.properties.diamonds + " Lives: " + Game.lives;
+        Game.HUD.text = "Map " + Game.level + ":" + this.mapProps.name + " | Diamonds: " + Game.diamonds + " of " + this.mapProps.diamonds + " | Lives: " + Game.lives;
+
         if (!Game.player.alive) {
             if (Game.lives === 0) {
                 Game.HUD.text += " GAME OVER";
@@ -166,7 +168,6 @@ Game.playState = {
     _checkMapCollision: function() {
         // First detect if player can move
         var tile = Game.map.getTileWorldXY(Game.player.newX, Game.player.newY);
-        //console.log(tile.index)
 
         switch (tile.index) {
             case this.terrain.DIRT:
@@ -182,7 +183,7 @@ Game.playState = {
                     this.diamonds.getClosestTo(Game.player).kill();
 
                     // Hatch?
-                    if (Game.map.properties.diamonds === Game.diamonds) {
+                    if (this.mapProps.diamonds === Game.diamonds) {
                         this.sfx.hatch.play();
                         Engine.stage.backgroundColor = Phaser.Color.getColor(255, 255, 200);
                         var timer = Engine.time.create(false);
@@ -191,7 +192,7 @@ Game.playState = {
                         }, this);
                         timer.start();
                         Game.finish.animations.play("ready");
-                        this._mapRemove(Game.map.getTile(Game.map.properties.finishX, Game.map.properties.finishY));
+                        this._mapRemove(Game.map.getTile(this.mapProps.finishX, this.mapProps.finishY));
                     } else {
                         this.sfx.diamond.play();
                     }
@@ -230,9 +231,15 @@ Game.playState = {
         Game.player.y = Game.player.newY;
 
         // YOU WON?
-        if (Game.player.x / Game.tileSize === Game.map.properties.finishX &&
-                Game.player.y / Game.tileSize === Game.map.properties.finishY) {
-            alert("YOU WON")
+        if (Game.player.x / Game.tileSize === this.mapProps.finishX &&
+                Game.player.y / Game.tileSize === this.mapProps.finishY) {
+            Game.player.kill();
+
+            setTimeout(function() {
+                Game.level++;
+                Game.diamonds = 0;
+                Engine.state.start("play");
+            }, 5000);
         }
     },
 
