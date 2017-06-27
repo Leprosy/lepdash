@@ -124,6 +124,8 @@ Game.playState = {
         //"tiles name in JSON", "tileset" defined in preload state
         Game.map.setLayer("map" + Game.level);
         Game.layer = Game.map.createLayer("map" + Game.level);
+        if (!Game.layer) Engine.state.start("main");
+        // No more levels? Win the game
         Game.layer.resizeWorld();
         this.mapProps = Game.map.layers[Game.level - 1].properties;
         // Add diamonds
@@ -134,7 +136,6 @@ Game.playState = {
         this.diamonds.callAll("animations.play", "animations", "still");
         // Add player
         Game.player = this._createPlayer(this.mapProps.startX, this.mapProps.startY);
-        //Game.player.animations.play("tap");
         this.cursors = Engine.input.keyboard.createCursorKeys();
         // Add goal
         Game.finish = this._createFinish(this.mapProps.finishX, this.mapProps.finishY);
@@ -149,7 +150,8 @@ Game.playState = {
     },
     update: function() {
         if (this.updateTime < this.time.now) {
-            if (Game.player.alive) {
+            if (Game.player.alive && Game.player.animations.name !== "start" && Game.player.animations.name !== "hatch") {
+                // Player alive and not hatching
                 this._checkInput();
                 this._checkMapCollision();
             }
@@ -403,7 +405,15 @@ Game.playState = {
     },
     // Creates the player sprite and define it's animations
     _createPlayer: function(x, y) {
+        var _this = this;
         var player = Engine.add.sprite(Game.tileSize * x, Game.tileSize * y, "sprites");
+        player.animations.add("start", [ 30, 31, 30, 31, 30, 31 ], 5, false).onComplete.add(function() {
+            _this.sfx.hatch.play();
+            player.animations.play("hatch");
+        });
+        player.animations.add("hatch", [ 67, 57, 47 ], 10, false).onComplete.add(function() {
+            player.animations.play("still");
+        });
         player.animations.add("left", [ 10, 11, 12, 13, 14, 15, 16 ], 20, false);
         player.animations.add("right", [ 20, 21, 22, 23, 24, 25, 26 ], 20, false);
         player.animations.add("up", [ 10, 11, 12, 13, 14, 15, 16 ], 20, false);
@@ -417,6 +427,7 @@ Game.playState = {
         });
         player.newX = player.x;
         player.newY = player.y;
+        player.animations.play("start");
         return player;
     },
     // Create finish level object
