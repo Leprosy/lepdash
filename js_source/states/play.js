@@ -379,7 +379,7 @@ Game.playState = {
     _createPlayer: function(x, y) {
         var _this = this;
         var player = Engine.add.sprite(Game.tileSize * x, Game.tileSize * y, "sprites");
-        player.animations.add("start", [30, 31, 30, 31, 30, 31], 5, false).onComplete.add(function() {
+        player.animations.add("start", [30, 31, 30, 31, 30, 31, 30, 31], 5, false).onComplete.add(function() {
             _this.sfx.hatch.play();
             player.animations.play("hatch");
         });
