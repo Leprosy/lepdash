@@ -9,13 +9,10 @@ Game.loadState = {
         Engine.load.spritesheet("tiles", "img/tiles.png", Game.tileSize, Game.tileSize);
         Engine.load.tilemap("map", "maps/map.json", null, Phaser.Tilemap.TILED_JSON);
 
-        Engine.load.audio("theme", "snd/theme.ogg");
-        Engine.load.audio("boulder", "snd/boulder.ogg");
-        Engine.load.audio("diamond", "snd/diamond.ogg");
-        Engine.load.audio("dirt", "snd/dirt.ogg");
-        Engine.load.audio("explosion", "snd/explosion.ogg");
-        Engine.load.audio("hatch", "snd/hatch.ogg");
+        // SFX
+        Game.sfx = ["theme", "boulder", "diamond", "finished", "dirt", "explosion", "hatch"];
         for (i = 0; i < 8; ++i) Engine.load.audio("diamond" + i, "snd/diamond_" + i + ".ogg");
+        for (i in Game.sfx) Engine.load.audio(Game.sfx[i], "snd/" + Game.sfx[i] + ".ogg");
     },
 
     create: function() {

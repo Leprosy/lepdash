@@ -31,13 +31,10 @@ Game.loadState = {
         Engine.load.spritesheet("sprites", "img/sprites.png", Game.tileSize, Game.tileSize);
         Engine.load.spritesheet("tiles", "img/tiles.png", Game.tileSize, Game.tileSize);
         Engine.load.tilemap("map", "maps/map.json", null, Phaser.Tilemap.TILED_JSON);
-        Engine.load.audio("theme", "snd/theme.ogg");
-        Engine.load.audio("boulder", "snd/boulder.ogg");
-        Engine.load.audio("diamond", "snd/diamond.ogg");
-        Engine.load.audio("dirt", "snd/dirt.ogg");
-        Engine.load.audio("explosion", "snd/explosion.ogg");
-        Engine.load.audio("hatch", "snd/hatch.ogg");
+        // SFX
+        Game.sfx = [ "theme", "boulder", "diamond", "finished", "dirt", "explosion", "hatch" ];
         for (i = 0; i < 8; ++i) Engine.load.audio("diamond" + i, "snd/diamond_" + i + ".ogg");
+        for (i in Game.sfx) Engine.load.audio(Game.sfx[i], "snd/" + Game.sfx[i] + ".ogg");
     },
     create: function() {
         Engine.state.start("main");
@@ -96,13 +93,6 @@ Game.playState = {
     },
     create: function() {
         console.info("Game params", Game);
-        // SFX
-        this.sfx.boulder = Engine.add.audio("boulder");
-        this.sfx.diamond = Engine.add.audio("diamond");
-        this.sfx.dirt = Engine.add.audio("dirt");
-        this.sfx.explosion = Engine.add.audio("explosion");
-        this.sfx.hatch = Engine.add.audio("hatch");
-        for (i = 0; i < 8; ++i) this.sfx["diamond" + i] = Engine.add.audio("diamond" + i);
         // On esc, restart current map, lose a life. If game over, go back to menu
         var key = Engine.input.keyboard.addKey(Phaser.Keyboard.ESC);
         key.onDown.addOnce(function() {
@@ -118,6 +108,9 @@ Game.playState = {
         this._create();
     },
     _create: function() {
+        // SFX
+        for (i in Game.sfx) this.sfx[Game.sfx[i]] = Engine.add.audio(Game.sfx[i]);
+        for (i = 0; i < 8; ++i) this.sfx["diamond" + i] = Engine.add.audio("diamond" + i);
         // Build map
         Game.map = Engine.add.tilemap("map", Game.tileSize, Game.tileSize);
         Game.map.addTilesetImage("tiles", "tiles");
@@ -407,7 +400,7 @@ Game.playState = {
     _createPlayer: function(x, y) {
         var _this = this;
         var player = Engine.add.sprite(Game.tileSize * x, Game.tileSize * y, "sprites");
-        player.animations.add("start", [ 30, 31, 30, 31, 30, 31 ], 5, false).onComplete.add(function() {
+        player.animations.add("start", [ 30, 31, 30, 31, 30, 31, 30, 31 ], 5, false).onComplete.add(function() {
             _this.sfx.hatch.play();
             player.animations.play("hatch");
         });

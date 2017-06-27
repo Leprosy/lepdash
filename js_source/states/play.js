@@ -22,14 +22,6 @@ Game.playState = {
     create: function() {
         console.info("Game params", Game);
 
-        // SFX
-        this.sfx.boulder = Engine.add.audio("boulder");
-        this.sfx.diamond = Engine.add.audio("diamond");
-        this.sfx.dirt = Engine.add.audio("dirt");
-        this.sfx.explosion = Engine.add.audio("explosion");
-        this.sfx.hatch = Engine.add.audio("hatch");
-        for (i = 0; i < 8; ++i) this.sfx["diamond" + i] = Engine.add.audio("diamond" + i);
-
         // On esc, restart current map, lose a life. If game over, go back to menu
         var key = Engine.input.keyboard.addKey(Phaser.Keyboard.ESC);
         key.onDown.addOnce(function() {
@@ -47,6 +39,10 @@ Game.playState = {
     },
 
     _create: function() {
+        // SFX
+        for (i in Game.sfx) this.sfx[Game.sfx[i]] = Engine.add.audio(Game.sfx[i]);
+        for (i = 0; i < 8; ++i) this.sfx["diamond" + i] = Engine.add.audio("diamond" + i);
+
         // Build map
         Game.map = Engine.add.tilemap("map", Game.tileSize, Game.tileSize);
         Game.map.addTilesetImage("tiles", "tiles"); //"tiles name in JSON", "tileset" defined in preload state
