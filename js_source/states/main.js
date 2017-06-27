@@ -17,6 +17,7 @@ Game.mainState = {
         Game.level = 1;
         Game.diamonds = 0;
         Game.lives = 3;
+        Game.time = 0;
 
         // Wait for user input
         var key = Engine.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);

@@ -51,6 +51,7 @@ Game.playState = {
         if (!Game.layer) Engine.state.start("main"); // No more levels? Win the game
         Game.layer.resizeWorld();
         this.mapProps = Game.map.layers[Game.level - 1].properties;
+        Game.time = this.mapProps.time;
 
         // Add diamonds
         this.diamonds = Engine.add.group();
@@ -71,6 +72,7 @@ Game.playState = {
 
         // Timer
         this.updateTime = this.time.now + Game.speed;
+        this.timerTime = this.time.now + 8 * Game.speed;
         this.tapTime = this.time.now + Game.speed * 50;
     },
 
@@ -88,6 +90,17 @@ Game.playState = {
 
             this.updateTime = this.time.now + Game.speed;
         }
+
+        // Game timer decrease
+        if (this.timerTime < this.time.now) {
+            if (Game.time > 0) Game.time--;
+
+            if (Game.time === 0 && Game.player.alive) {
+                this._explode(Game.map.getTile(Game.player.x / Game.tileSize, Game.player.y / Game.tileSize - 1));
+            } else {
+                this.timerTime = this.time.now + 8 * Game.speed;
+            }
+        }
     },
 
     render: function() {
@@ -98,7 +111,10 @@ Game.playState = {
 
 
     _updateHUD: function() {
-        Game.HUD.text = "Map " + Game.level + ":" + this.mapProps.name + " | Diamonds: " + Game.diamonds + " of " + this.mapProps.diamonds + " | Lives: " + Game.lives;
+        Game.HUD.text = "Map " + Game.level + ":" + this.mapProps.name
+                      + " | Diamonds: " + Game.diamonds + " of " + this.mapProps.diamonds
+                      + " | Lives: " + Game.lives
+                      + " | Time: " + Game.time;
 
         if (!Game.player.alive) {
             if (Game.lives === 0) {
@@ -329,7 +345,7 @@ Game.playState = {
     },
 
     // Spawn a explosion centered on tile. If the player is inside, it's gonna get killed...
-    _explode: function(tile, killPlayer) {
+    _explode: function(tile) {
         this.sfx.explosion.play();
 
         for (i = -1; i < 2; ++i) {

@@ -13,7 +13,8 @@
              "finishY":10,
              "name":"This is the first map",
              "startX":2,
-             "startY":2
+             "startY":2,
+             "time":120
             },
          "propertytypes":
             {
@@ -23,7 +24,8 @@
              "finishY":"int",
              "name":"string",
              "startX":"int",
-             "startY":"int"
+             "startY":"int",
+             "time":"int"
             },
          "type":"tilelayer",
          "visible":false,
@@ -44,7 +46,8 @@
              "finishY":1,
              "name":"Wow",
              "startX":23,
-             "startY":15
+             "startY":15,
+             "time":50
             },
          "propertytypes":
             {
@@ -54,7 +57,8 @@
              "finishY":"int",
              "name":"string",
              "startX":"int",
-             "startY":"int"
+             "startY":"int",
+             "time":"int"
             },
          "type":"tilelayer",
          "visible":true,

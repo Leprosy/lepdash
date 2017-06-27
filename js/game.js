@@ -63,6 +63,7 @@ Game.mainState = {
         Game.level = 1;
         Game.diamonds = 0;
         Game.lives = 3;
+        Game.time = 0;
         // Wait for user input
         var key = Engine.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         key.onDown.addOnce(function() {
@@ -121,6 +122,7 @@ Game.playState = {
         // No more levels? Win the game
         Game.layer.resizeWorld();
         this.mapProps = Game.map.layers[Game.level - 1].properties;
+        Game.time = this.mapProps.time;
         // Add diamonds
         this.diamonds = Engine.add.group();
         this.diamonds.enableBody = true;
@@ -139,6 +141,7 @@ Game.playState = {
         });
         // Timer
         this.updateTime = this.time.now + Game.speed;
+        this.timerTime = this.time.now + 8 * Game.speed;
         this.tapTime = this.time.now + Game.speed * 50;
     },
     update: function() {
@@ -154,10 +157,19 @@ Game.playState = {
             this._updateHUD();
             this.updateTime = this.time.now + Game.speed;
         }
+        // Game timer decrease
+        if (this.timerTime < this.time.now) {
+            if (Game.time > 0) Game.time--;
+            if (Game.time === 0 && Game.player.alive) {
+                this._explode(Game.map.getTile(Game.player.x / Game.tileSize, Game.player.y / Game.tileSize - 1));
+            } else {
+                this.timerTime = this.time.now + 8 * Game.speed;
+            }
+        }
     },
     render: function() {},
     _updateHUD: function() {
-        Game.HUD.text = "Map " + Game.level + ":" + this.mapProps.name + " | Diamonds: " + Game.diamonds + " of " + this.mapProps.diamonds + " | Lives: " + Game.lives;
+        Game.HUD.text = "Map " + Game.level + ":" + this.mapProps.name + " | Diamonds: " + Game.diamonds + " of " + this.mapProps.diamonds + " | Lives: " + Game.lives + " | Time: " + Game.time;
         if (!Game.player.alive) {
             if (Game.lives === 0) {
                 Game.HUD.text += " GAME OVER";
@@ -359,7 +371,7 @@ Game.playState = {
         return [ this.terrain.DIAMOND, this.terrain.BOULDER ].indexOf(tile.index) >= 0 && !tile.properties.falling;
     },
     // Spawn a explosion centered on tile. If the player is inside, it's gonna get killed...
-    _explode: function(tile, killPlayer) {
+    _explode: function(tile) {
         this.sfx.explosion.play();
         for (i = -1; i < 2; ++i) {
             for (j = 0; j < 3; ++j) {

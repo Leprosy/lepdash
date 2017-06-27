@@ -12,6 +12,7 @@
    <property name="name" value="This is the first map"/>
    <property name="startX" type="int" value="2"/>
    <property name="startY" type="int" value="2"/>
+   <property name="time" type="int" value="120"/>
   </properties>
   <data encoding="csv">
 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
@@ -75,6 +76,7 @@
    <property name="name" value="Wow"/>
    <property name="startX" type="int" value="23"/>
    <property name="startY" type="int" value="15"/>
+   <property name="time" type="int" value="50"/>
   </properties>
   <data encoding="csv">
 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
