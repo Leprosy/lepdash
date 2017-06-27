@@ -270,6 +270,7 @@ Game.playState = {
         // YOU WON?
         if (Game.player.x / Game.tileSize === this.mapProps.finishX && Game.player.y / Game.tileSize === this.mapProps.finishY) {
             Game.player.kill();
+            this.sfx.finished.play();
             setTimeout(function() {
                 Game.level++;
                 Game.diamonds = 0;
