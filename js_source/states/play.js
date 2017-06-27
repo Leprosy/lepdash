@@ -52,6 +52,7 @@ Game.playState = {
         Game.map.addTilesetImage("tiles", "tiles"); //"tiles name in JSON", "tileset" defined in preload state
         Game.map.setLayer("map" + Game.level);
         Game.layer = Game.map.createLayer("map" + Game.level);
+        if (!Game.layer) Engine.state.start("main"); // No more levels? Win the game
         Game.layer.resizeWorld();
         this.mapProps = Game.map.layers[Game.level - 1].properties;
 
