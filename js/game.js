@@ -114,35 +114,38 @@ Game.playState = {
         for (i = 0; i < 8; ++i) this.sfx["diamond" + i] = Engine.add.audio("diamond" + i);
         // Build map
         Game.map = Engine.add.tilemap("map", Game.tileSize, Game.tileSize);
-        Game.map.addTilesetImage("tiles", "tiles");
-        //"tiles name in JSON", "tileset" defined in preload state
-        Game.map.setLayer("map" + Game.level);
-        Game.layer = Game.map.createLayer("map" + Game.level);
-        if (!Game.layer) Engine.state.start("main");
-        // No more levels? Win the game
-        Game.layer.resizeWorld();
-        this.mapProps = Game.map.layers[Game.level - 1].properties;
-        Game.time = this.mapProps.time;
-        // Add diamonds
-        this.diamonds = Engine.add.group();
-        this.diamonds.enableBody = true;
-        Game.map.createFromTiles(this.terrain.DIAMOND, null, "sprites", Game.level - 1, this.diamonds);
-        this.diamonds.callAll("animations.add", "animations", "still", [ 40, 50, 60, 70, 41, 51, 61, 71 ], 10, true);
-        this.diamonds.callAll("animations.play", "animations", "still");
-        // Add player
-        Game.player = this._createPlayer(this.mapProps.startX, this.mapProps.startY);
-        this.cursors = Engine.input.keyboard.createCursorKeys();
-        // Add goal
-        Game.finish = this._createFinish(this.mapProps.finishX, this.mapProps.finishY);
-        // Add HUD
-        Game.HUD = Engine.add.text(10, Game.height - 15, "", {
-            font: "15px Arial",
-            fill: "#ffffff"
-        });
-        // Timer
-        this.updateTime = this.time.now + Game.speed;
-        this.timerTime = this.time.now + 8 * Game.speed;
-        this.tapTime = this.time.now + Game.speed * 50;
+        // No more levels => Endgame
+        if (Game.level > Game.map.layers.length) {
+            Engine.state.start("main");
+        } else {
+            Game.map.addTilesetImage("tiles", "tiles");
+            //"tiles name in JSON", "tileset" defined in preload state
+            Game.map.setLayer("map" + Game.level);
+            Game.layer = Game.map.createLayer("map" + Game.level);
+            Game.layer.resizeWorld();
+            this.mapProps = Game.map.layers[Game.level - 1].properties;
+            Game.time = this.mapProps.time;
+            // Add diamonds
+            this.diamonds = Engine.add.group();
+            this.diamonds.enableBody = true;
+            Game.map.createFromTiles(this.terrain.DIAMOND, null, "sprites", Game.level - 1, this.diamonds);
+            this.diamonds.callAll("animations.add", "animations", "still", [ 40, 50, 60, 70, 41, 51, 61, 71 ], 10, true);
+            this.diamonds.callAll("animations.play", "animations", "still");
+            // Add player
+            Game.player = this._createPlayer(this.mapProps.startX, this.mapProps.startY);
+            this.cursors = Engine.input.keyboard.createCursorKeys();
+            // Add goal
+            Game.finish = this._createFinish(this.mapProps.finishX, this.mapProps.finishY);
+            // Add HUD
+            Game.HUD = Engine.add.text(10, Game.height - 15, "", {
+                font: "15px Arial",
+                fill: "#ffffff"
+            });
+            // Timer
+            this.updateTime = this.time.now + Game.speed;
+            this.timerTime = this.time.now + 8 * Game.speed;
+            this.tapTime = this.time.now + Game.speed * 50;
+        }
     },
     update: function() {
         if (this.updateTime < this.time.now) {
