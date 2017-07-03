@@ -12,7 +12,8 @@ Game.playState = {
         DIRT2: 6,
         BOULDER: 7,
         DIAMOND: 8,
-        EXPLOSION: 9
+        EXPLOSION: 9,
+        FIREFLY: 10
     },
 
     preload: function() {
@@ -63,6 +64,14 @@ Game.playState = {
             Game.map.createFromTiles(this.terrain.DIAMOND, null, "sprites", Game.level - 1, this.diamonds);
             this.diamonds.callAll('animations.add', 'animations', "still", [40, 50, 60, 70, 41, 51, 61, 71], 10, true);
             this.diamonds.callAll('animations.play', 'animations', "still");
+
+            // Add fireflies
+            this.fireflies = Engine.add.group();
+            this.fireflies.enableBody = true;
+            Game.map.createFromTiles(this.terrain.FIREFLY, null, "sprites", Game.level - 1, this.fireflies);
+            this.fireflies.callAll('animations.add', 'animations', "still", [45, 55, 65, 75], 10, true);
+            this.fireflies.callAll('animations.play', 'animations', "still");
+            console.log(this.fireflies)
 
             // Add player
             Game.player = this._createPlayer(this.mapProps.startX, this.mapProps.startY);
