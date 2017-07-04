@@ -375,25 +375,29 @@ Game.playState = {
         var _this = this;
         this.entities.forEach(function(spr) {
             if (spr.properties.type === _this.terrain.FIREFLY) {
+                var x = spr.x / Game.tileSize;
+                var y = spr.y / Game.tileSize;
                 // Try to kill player
 
                 // Try to rotate left
                 var checkAngle = (spr.properties.angle - Math.PI / 2) % (Math.PI * 2); // Turn left
-                var newX = spr.x / Game.tileSize + Math.round(Math.cos(checkAngle));
-                var newY = spr.y / Game.tileSize + Math.round(Math.sin(checkAngle));
+                var newX = x + Math.round(Math.cos(checkAngle));
+                var newY = y + Math.round(Math.sin(checkAngle));
 
                 if (Game.map.getTile(newX, newY).index === _this.terrain.NULL) {
-                    spr.x += Math.round(Math.cos(checkAngle)) * Game.tileSize;
-                    spr.y += Math.round(Math.sin(checkAngle)) * Game.tileSize;
+                    _this._mapMove(Game.map.getTile(x,y), Game.map.getTile(newX, newY));
+                    //spr.x += Math.round(Math.cos(checkAngle)) * Game.tileSize;
+                    //spr.y += Math.round(Math.sin(checkAngle)) * Game.tileSize;
                     spr.properties.angle = checkAngle;
                 } else {
                     // Try to advance
-                    var newX = spr.x / Game.tileSize + Math.round(Math.cos(spr.properties.angle));
-                    var newY = spr.y / Game.tileSize + Math.round(Math.sin(spr.properties.angle));
+                    var newX = x + Math.round(Math.cos(spr.properties.angle));
+                    var newY = y + Math.round(Math.sin(spr.properties.angle));
 
                     if (Game.map.getTile(newX, newY).index === _this.terrain.NULL) {
-                        spr.x = newX * Game.tileSize;
-                        spr.y = newY * Game.tileSize;
+                        _this._mapMove(Game.map.getTile(x, y), Game.map.getTile(newX, newY));
+                        //spr.x = newX * Game.tileSize;
+                        //spr.y = newY * Game.tileSize;
                     } else {
                         // No good. Rotate right and wait next update
                         spr.properties.angle = (spr.properties.angle + Math.PI / 2) % (Math.PI * 2); // Turn right                        
