@@ -58,20 +58,21 @@ Game.playState = {
             this.mapProps = Game.map.layers[Game.level - 1].properties;
             Game.time = this.mapProps.time;
 
-            // Add diamonds
-            this.diamonds = Engine.add.group();
-            this.diamonds.enableBody = true;
-            Game.map.createFromTiles(this.terrain.DIAMOND, null, "sprites", Game.level - 1, this.diamonds);
-            this.diamonds.callAll('animations.add', 'animations', "still", [40, 50, 60, 70, 41, 51, 61, 71], 10, true);
-            this.diamonds.callAll('animations.play', 'animations', "still");
+            // Add entities: diamonds, fireflies
+            this.entities = Engine.add.group();
+            this.entities.enableBody = true;
+            Game.map.createFromTiles(this.terrain.DIAMOND, null, "sprites", Game.level - 1, this.entities, {properties: { type: this.terrain.DIAMOND }});
+            Game.map.createFromTiles(this.terrain.FIREFLY, null, "sprites", Game.level - 1, this.entities, {properties: { type: this.terrain.FIREFLY, angle: 0 }});
 
-            // Add fireflies
-            this.fireflies = Engine.add.group();
-            this.fireflies.enableBody = true;
-            Game.map.createFromTiles(this.terrain.FIREFLY, null, "sprites", Game.level - 1, this.fireflies);
-            this.fireflies.callAll('animations.add', 'animations', "still", [45, 55, 65, 75], 10, true);
-            this.fireflies.callAll('animations.play', 'animations', "still");
-            console.log(this.fireflies)
+            var _this = this;
+            this.entities.forEach(function(spr) {
+                if (spr.properties.type == _this.terrain.DIAMOND) {
+                    spr.animations.add("still", [40, 50, 60, 70, 41, 51, 61, 71], 10, true);
+                } else {
+                    spr.animations.add("still", [45, 55, 65, 75], 10, true);
+                }
+                spr.animations.play("still");
+            });
 
             // Add player
             Game.player = this._createPlayer(this.mapProps.startX, this.mapProps.startY);
@@ -99,7 +100,8 @@ Game.playState = {
 
             this._updateFallings();
             this._setFallings();
-            this._checkStatus();
+            this._updateFireflies();
+            //this._checkStatus();
             this._updateHUD();
 
             this.updateTime = this.time.now + Game.speed;
@@ -190,10 +192,10 @@ Game.playState = {
     // Moves a tile
     _mapMove: function(tile1, tile2) {
         // Diamond. move group sprite
-        if (tile1.index === this.terrain.DIAMOND) {
-            var dia = this.diamonds.getClosestTo({x: tile1.x * Game.tileSize, y: tile1.y * Game.tileSize});
-            dia.x = tile2.x * Game.tileSize;
-            dia.y = tile2.y * Game.tileSize;
+        if (tile1.index === this.terrain.DIAMOND || tile1.index === this.terrain.FIREFLY) {
+            var obj = this.entities.getClosestTo({x: tile1.x * Game.tileSize, y: tile1.y * Game.tileSize});
+            obj.x = tile2.x * Game.tileSize;
+            obj.y = tile2.y * Game.tileSize;
         }
 
         var index = tile1.index;
@@ -222,7 +224,7 @@ Game.playState = {
                 if (!tile.properties.falling) {
                     Game.diamonds++;
                     this._mapRemove(tile);
-                    this.diamonds.getClosestTo(Game.player).kill();
+                    this.entities.getClosestTo(Game.player).kill();
 
                     // Hatch?
                     if (this.mapProps.diamonds === Game.diamonds) {
@@ -369,6 +371,38 @@ Game.playState = {
         }
     },
 
+    _updateFireflies: function() {
+        var _this = this;
+        this.entities.forEach(function(spr) {
+            if (spr.properties.type === _this.terrain.FIREFLY) {
+                // Try to kill player
+
+                // Try to rotate left
+                var checkAngle = (spr.properties.angle - Math.PI / 2) % (Math.PI * 2); // Turn left
+                var newX = spr.x / Game.tileSize + Math.round(Math.cos(checkAngle));
+                var newY = spr.y / Game.tileSize + Math.round(Math.sin(checkAngle));
+
+                if (Game.map.getTile(newX, newY).index === _this.terrain.NULL) {
+                    spr.x += Math.round(Math.cos(checkAngle)) * Game.tileSize;
+                    spr.y += Math.round(Math.sin(checkAngle)) * Game.tileSize;
+                    spr.properties.angle = checkAngle;
+                } else {
+                    // Try to advance
+                    var newX = spr.x / Game.tileSize + Math.round(Math.cos(spr.properties.angle));
+                    var newY = spr.y / Game.tileSize + Math.round(Math.sin(spr.properties.angle));
+
+                    if (Game.map.getTile(newX, newY).index === _this.terrain.NULL) {
+                        spr.x = newX * Game.tileSize;
+                        spr.y = newY * Game.tileSize;
+                    } else {
+                        // No good. Rotate right and wait next update
+                        spr.properties.angle = (spr.properties.angle + Math.PI / 2) % (Math.PI * 2); // Turn right                        
+                    }
+                }
+            }
+        });
+    },
+
     // Check if a tile is fallable
     _isFallable: function(tile) {
         return ([this.terrain.DIAMOND, this.terrain.BOULDER].indexOf(tile.index) >= 0 && !tile.properties.falling);
@@ -399,9 +433,9 @@ Game.playState = {
         var tile = Game.map.getTile(x, y);
         tile.properties.falling = false;
 
-        if (tile.index === this.terrain.DIAMOND) {
-            var dia = this.diamonds.getClosestTo({x: tile.x * Game.tileSize, y: tile.y * Game.tileSize});
-            dia.kill();
+        if (tile.index === this.terrain.DIAMOND || tile.index === this.terrain.FIREFLY) {
+            var obj = this.entities.getClosestTo({x: tile.x * Game.tileSize, y: tile.y * Game.tileSize});
+            obj.kill();
         }
 
         this._mapRemove(tile, this.terrain.EXPLOSION);
