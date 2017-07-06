@@ -8,6 +8,8 @@ Game.mainState = {
         // Draw main menu
         Engine.add.text(10, 10, Game.name, {font: "20px Arial", fill: "#ffffff"});
         Engine.add.text(10, 50, "press space to start", {font: "12px Arial", fill: "#ffffff"});
+        Engine.add.text(10, 150, "space to dig", {font: "12px Arial", fill: "#ffffff"});
+        Engine.add.text(10, 190, "esc to restart level", {font: "12px Arial", fill: "#ffffff"});
 
         var music = Engine.add.audio("theme");
         music.loop = true;

@@ -163,6 +163,8 @@ Game.playState = {
             this.updateTime = this.time.now + Game.speed;
             this.timerTime = this.time.now + 8 * Game.speed;
             this.tapTime = this.time.now + Game.speed * 50;
+            // Space bar
+            this.button = Engine.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         }
     },
     update: function() {
@@ -313,9 +315,14 @@ Game.playState = {
           default:
             break;
         }
-        // Set new position(if the player can move)
-        Game.player.x = Game.player.newX;
-        Game.player.y = Game.player.newY;
+        // Set new position(if the player can move). Check button pressed.
+        if (this.button.isUp) {
+            Game.player.x = Game.player.newX;
+            Game.player.y = Game.player.newY;
+        } else {
+            Game.player.newX = Game.player.x;
+            Game.player.newY = Game.player.y;
+        }
         // YOU WON?
         if (Game.player.x / Game.tileSize === this.mapProps.finishX && Game.player.y / Game.tileSize === this.mapProps.finishY) {
             Game.player.kill();
