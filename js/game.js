@@ -56,6 +56,14 @@ Game.mainState = {
             font: "12px Arial",
             fill: "#ffffff"
         });
+        Engine.add.text(10, 150, "space to dig", {
+            font: "12px Arial",
+            fill: "#ffffff"
+        });
+        Engine.add.text(10, 190, "esc to restart level", {
+            font: "12px Arial",
+            fill: "#ffffff"
+        });
         var music = Engine.add.audio("theme");
         music.loop = true;
         music.play();
