@@ -410,6 +410,13 @@ Game.playState = {
                 var x = spr.x / Game.tileSize;
                 var y = spr.y / Game.tileSize;
                 // Try to kill player
+                for (i = -1; i <= 1; ++i) {
+                    for (j = -1; j <= 1; ++j) {
+                        if (Game.player.x + i * Game.tileSize === spr.x && Game.player.y + j * Game.tileSize === spr.y) {
+                            _this._explode(Game.map.getTile(x, y));
+                        }
+                    }
+                }
                 // Try to rotate left
                 var checkAngle = (spr.properties.angle - Math.PI / 2) % (Math.PI * 2);
                 // Turn left
