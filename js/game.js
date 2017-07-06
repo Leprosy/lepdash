@@ -361,6 +361,9 @@ Game.playState = {
                             tileBellow.properties.falling = true;
                             this._mapMove(tile, tileBellow);
                         }
+                    } else if (tileBellow.index === this.terrain.FIREFLY) {
+                        // Kill fireflies
+                        this._explode(tile);
                     } else {
                         tile.properties.falling = false;
                         // Diamond or boulder sound
