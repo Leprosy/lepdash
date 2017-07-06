@@ -382,7 +382,7 @@ Game.playState = {
     _updateFireflies: function() {
         var _this = this;
         this.entities.forEach(function(spr) {
-            if (spr.properties.type === _this.terrain.FIREFLY) {
+            if (spr.properties.type === _this.terrain.FIREFLY && spr.alive) {
                 var x = spr.x / Game.tileSize;
                 var y = spr.y / Game.tileSize;
 
@@ -390,7 +390,7 @@ Game.playState = {
                 for (i = -1; i <= 1; ++i) {
                     for (j = -1; j <= 1; ++j) {
                         if (Game.player.x + i * Game.tileSize === spr.x && Game.player.y + j * Game.tileSize === spr.y) {
-                            _this._explode(Game.map.getTile(x, y));
+                            _this._explode(Game.map.getTile(x, y - 1));
                         }
                     }
                 }
