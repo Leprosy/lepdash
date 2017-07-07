@@ -61,14 +61,16 @@ Game.playState = {
             // Add entities: diamonds, fireflies
             this.entities = Engine.add.group();
             this.entities.enableBody = true;
-            Game.map.createFromTiles(this.terrain.DIAMOND, null, "sprites", Game.level - 1, this.entities, {properties: { type: this.terrain.DIAMOND }});
-            Game.map.createFromTiles(this.terrain.FIREFLY, null, "sprites", Game.level - 1, this.entities, {properties: { type: this.terrain.FIREFLY, angle: 0 }});
+            Game.map.createFromTiles(this.terrain.DIAMOND, null, "sprites", Game.level - 1, this.entities, { __type: this.terrain.DIAMOND });
+            Game.map.createFromTiles(this.terrain.FIREFLY, null, "sprites", Game.level - 1, this.entities, { __type: this.terrain.FIREFLY, __angle: 0 });
 
             var _this = this;
+            var name = 0;
             this.entities.forEach(function(spr) {
-                if (spr.properties.type == _this.terrain.DIAMOND) {
+                if (spr.__type == _this.terrain.DIAMOND) {
                     spr.animations.add("still", [40, 50, 60, 70, 41, 51, 61, 71], 10, true);
                 } else {
+                    spr.__id = name++;
                     spr.animations.add("still", [45, 55, 65, 75], 10, true);
                 }
                 spr.animations.play("still");
@@ -385,11 +387,11 @@ Game.playState = {
     _updateFireflies: function() {
         var _this = this;
         this.entities.forEach(function(spr) {
-            if (spr.properties.type === _this.terrain.FIREFLY && spr.alive) {
+            if (spr.__type === _this.terrain.FIREFLY && spr.alive) {
                 var x = spr.x / Game.tileSize;
                 var y = spr.y / Game.tileSize;
 
-                // Try to kill player
+                // First, try to kill player if near
                 for (i = -1; i <= 1; ++i) {
                     for (j = -1; j <= 1; ++j) {
                         if (Game.player.x + i * Game.tileSize === spr.x && Game.player.y + j * Game.tileSize === spr.y) {
@@ -398,28 +400,25 @@ Game.playState = {
                     }
                 }
 
-                // Try to rotate left
-                var checkAngle = (spr.properties.angle - Math.PI / 2) % (Math.PI * 2); // Turn left
+                // Now let's follow the rules
+                var checkAngle = (spr.__angle - Math.PI / 2) % (Math.PI * 2); // Turn left
                 var newX = x + Math.round(Math.cos(checkAngle));
                 var newY = y + Math.round(Math.sin(checkAngle));
 
                 if (Game.map.getTile(newX, newY).index === _this.terrain.NULL) {
+                    // Try to rotate left
                     _this._mapMove(Game.map.getTile(x,y), Game.map.getTile(newX, newY));
-                    //spr.x += Math.round(Math.cos(checkAngle)) * Game.tileSize;
-                    //spr.y += Math.round(Math.sin(checkAngle)) * Game.tileSize;
-                    spr.properties.angle = checkAngle;
+                    spr.__angle = checkAngle;
                 } else {
                     // Try to advance
-                    var newX = x + Math.round(Math.cos(spr.properties.angle));
-                    var newY = y + Math.round(Math.sin(spr.properties.angle));
+                    var newX = x + Math.round(Math.cos(spr.__angle));
+                    var newY = y + Math.round(Math.sin(spr.__angle));
 
                     if (Game.map.getTile(newX, newY).index === _this.terrain.NULL) {
                         _this._mapMove(Game.map.getTile(x, y), Game.map.getTile(newX, newY));
-                        //spr.x = newX * Game.tileSize;
-                        //spr.y = newY * Game.tileSize;
                     } else {
                         // No good. Rotate right and wait next update
-                        spr.properties.angle = (spr.properties.angle + Math.PI / 2) % (Math.PI * 2); // Turn right                        
+                        spr.__angle = (spr.__angle + Math.PI / 2) % (Math.PI * 2); // Turn right                        
                     }
                 }
             }
